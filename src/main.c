@@ -4,32 +4,16 @@
 #include <pthread.h>
 #include <unistd.h>
 
-#define BUFFER_SIZE 256
-#define MAX_BLOCKS  256
+#include "defs.h"
 
-typedef enum {
-  UNIFORMSPEED,
-  RANDOMSPEED
-} biker_speed_t;
-
-typedef enum {
-  PLANE,
-  UP,
-  DOWN
-} roadblock_t;
-
-typedef struct {
-  roadblock_t block_type;
-  size_t      block_length;
-} roadblock_info;
-
-typedef struct {
-  size_t          biker_num,
-                  road_capacity,
-                  road_total_length;
-  biker_speed_t   speed_type;
-  roadblock_info  blocks[MAX_BLOCKS];
-} simulation_info;
+void dump_simulation_info (const simulation_info *info) {
+  printf(
+    "%lu\n%lu\n%c\n%lu\n",
+    info->biker_num,
+    info->road_capacity,
+    SPEEDTYPE_NAMES[info->speed_type],
+    info->road_total_length);
+}
 
 /* 0  -> success
  * -1 -> failure */
@@ -73,15 +57,13 @@ thread_function (void *arg) {
   return NULL;
 }
 
-char SPEEDTYPE_NAMES[2] = { 'U', 'A' };
-
 int
 main (int argc, char **argv) {
 
   pthread_t       mythread;
   simulation_info info;
 
-  if (argc < 1) {
+  if (argc < 2) {
     puts("-.-");
     return EXIT_FAILURE;
   }
@@ -91,12 +73,7 @@ main (int argc, char **argv) {
     return EXIT_FAILURE;
   }
 
-  printf(
-    "%lu\n%lu\n%c\n%lu\n",
-    info.biker_num,
-    info.road_capacity,
-    SPEEDTYPE_NAMES[info.speed_type],
-    info.road_total_length);
+  dump_simulation_info(&info);
 
   if (pthread_create(&mythread, NULL, thread_function, NULL)) {
     printf("error creating thread.");
