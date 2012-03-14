@@ -15,7 +15,7 @@ void dump_simulation_info (const simulation_info *info) {
     info->road_total_length);
 }
 
-/* 0  -> success
+/* -0 -> success
  * -1 -> failure */
 int
 load_simulation_info (const char* filename, simulation_info *info) {
