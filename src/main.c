@@ -77,8 +77,8 @@ main (int argc, char **argv) {
   }
   
   kilometers = malloc(sizeof(size_t)*info.road_total_length);
-  arg.road_total_length = info.road_total_length;
-  arg.road_capacity = info.road_capacity;
+  args.road_total_length = info.road_total_length;
+  args.road_capacity = info.road_capacity;
 
   dump_simulation_info(&info);
 
