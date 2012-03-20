@@ -13,7 +13,7 @@ load_simulation_info (const char* filename, simulation_info *info) {
   if (!input) return -1;
   /* biker num */
   fgets(buffer, BUFFER_SIZE, input);
-  sscanf(buffer, "%lu", &info->biker_num);
+  sscanf(buffer, "%lu", &info->bikers_num);
   /* road capacity */
   fgets(buffer, BUFFER_SIZE, input);
   sscanf(buffer, "%lu", &info->road_capacity);

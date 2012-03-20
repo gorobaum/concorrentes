@@ -19,12 +19,19 @@ typedef enum {
 typedef struct {
   size_t      bikers_num;
   roadblock_t type;
+} kilometer;
 
 typedef struct {
   int     current_km;
   double  current_meter,
           speed[3]; /* METERS/MIN */
 } biker_t;
+
+typedef struct {
+  biker_t *biker;
+  size_t  road_total_length,
+          road_capacity;
+} arg_t;
 
 typedef struct {
   roadblock_t type;
