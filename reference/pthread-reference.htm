@@ -1,0 +1,970 @@
+<html><head><title>Pthreads APIs - User's Guide and Reference</title></head>
+<body BGCOLOR="FFFFFF">
+ 
+<a href="concep32.htm" tppabs="http://web.ss.pub.ro/%7Ebogdan/APC/2000/uguide/concep32.htm">[Prev]</a> <a href="document.htm" tppabs="http://web.ss.pub.ro/%7Ebogdan/APC/2000/uguide/document.htm">[Contents]</a> <a href="users-g1.htm" tppabs="http://web.ss.pub.ro/%7Ebogdan/APC/2000/uguide/users-g1.htm">[Next]</a> 
+
+
+<hr><br>
+ 
+<a name="301162">
+<h1> Pthread API Reference</h1>
+</a><a name="318437">
+<h1> API Introduction</h1>
+</a><a name="302341">
+<h2> Header files</h2>
+</a><pre>#include &lt;pthread.h&gt;
+#include &lt;sched.h&gt;
+</pre>
+<a name="302339">
+<h2> Preprocessor Values</h2>
+</a>An application compiling for Pthreads must define the preprocessor value _MULTI_THREADED before any C statements (including header files), and especially before the pthread.h header file. Use the DEFINE keyword on the compilation command or, use the #define statement in the C source modules before including the pthread.h header file.<p>
+<pre>CRTCMOD library/module DEFINE(_MULTI_THREADED)
+OR
+#define _MULTI_THREADED
+</pre>
+<a name="302354">
+<h2> Primitive data types</h2>
+</a>The Pthread types and functions follow the following naming conventions. If the type of object is not a thread, <em>object</em> represents the type of object, <strong>action</strong> is an operation to be performed on the object, <strong>np</strong> or <strong>NP </strong>indicates that the name or symbol is a non portable extension to the API set, and <strong>PURPOSE</strong> indicates the use or purpose of the symbol.<p>
+<dl>
+<a name="302351">
+<dt>types
+</a><dd>pthread[<em>_object</em>][<strong>_np</strong>]_t
+<a name="381416">
+<dt>functions
+</a><dd>pthread[<em>_object</em>]_action[<strong>_np</strong>]
+<a name="381420">
+<dt>Constants and Macros
+</a><dd>PTHREAD_<em>PURPOSE</em>[<strong>_NP</strong>]
+</dl>
+ 
+<Table Border="3">
+<caption></caption>
+<tr><th>type
+<th> Description
+
+<tr><td>pthread_attr_t
+<td>Thread creation attribute
+
+<tr><td>pthread_cleanup_entry_np_t
+<td>Cancelation cleanup handler entry
+
+<tr><td>pthread_condattr_t
+<td>Condition variable creation attribute
+
+<tr><td>pthread_cond_t
+<td>Condition Variable synchronization primitive
+
+<tr><td>pthread_joinoption_np_t
+<td>Options structure for extensions to pthread_join()
+
+<tr><td>pthread_key_t
+<td>Thread local storage key
+
+<tr><td>pthread_mutexattr_t
+<td>Mutex creation attribute
+
+<tr><td>pthread_mutex_t
+<td>Mutex (Mutual exclusion) synchronization primitive
+
+<tr><td>pthread_once_t
+<td>Once time initialization control variable
+
+<tr><td>pthread_option_np_t
+<td>Pthread run-time options structure
+
+<tr><td>pthread_rwlockattr_t
+<td>Read/Write lock attribute
+
+<tr><td>pthread_rwlock_t
+<td>Read/Write synchronization primitive
+
+<tr><td>pthread_t
+<td>Pthread handle
+
+<tr><td>pthread_id_np_t
+<td>Thread ID. For use as an integral type.
+
+<tr><td>struct sched_param
+<td>Scheduling parameters (priority and policy)
+
+
+</Table>
+
+<Table>
+<tr><td>
+</Table>
+<p>
+After creating the primitive objects of type <strong>pthread_cond_t</strong> and <strong>pthread_mutex_t</strong> using the appropriate initialization functions, those objects must not be copied or moved to a new location. If the condition variable or mutex is copied or moved to a new location, the new primitive object will be invalid and unable to be used. Attempts to use the new object will result in the <strong>EINVAL</strong> error.<p>
+<a name="302346">
+<h2> Function prototypes</h2>
+</a>All functions except for <strong>pthread_exit</strong>(), <strong>pthread_getspecific</strong>(), <strong>pthread_self</strong>(), <strong>pthread_test_exit_np</strong>(), <strong>pthread_is_multithreaded_np</strong>()and <strong>pthread_getconcurrency</strong>() return an errno value to indicate failure, or 0 to indicate success. <p>
+<dl>
+<dt><dd> 
+</dl>
+<a name="302357">
+<h2> Thread Attributes 
+<Table Border="3">
+<caption></caption>
+<tr><th>Attribute
+<th> Default value
+<th> supported values
+
+<tr><td><em>detachstate</em>
+<td> <strong>PTHREAD_CREATE_JOINABLE</strong>
+<td><strong>PTHREAD_CREATE_JOINABLE</strong> <strong>PTHREAD_CREATE_DETACHED</strong>
+
+<tr><td><em>schedparam</em>
+<td> <strong>SCHED_OTHER</strong> with priority equal to <strong>PRIORITY_DEFAULT</strong> (0)
+<td> <strong>SCHED_OTHER</strong> with priority &lt;= <strong>PTHREAD_PRIO_MAX</strong> and priority &gt;= <strong>PTHREAD_PRIO_MIN</strong>
+
+<tr><td><em>contentionscope</em>
+<td><strong>PTHREAD_SCOPE_SYSTEM</strong>
+<td><strong>PTHREAD_SCOPE_SYSTEM</strong>
+
+<tr><td><em>inheritsched</em>
+<td><strong>PTHREAD_EXPLICIT_SCHED</strong>, priority equal <strong>PRIORITY_DEFAULT</strong> (0)
+<td><strong>PTHREAD_EXPLICIT_SCHED</strong> or <strong>PTHREAD_INHERIT_SCHED</strong>
+
+<tr><td><em>schedpolicy</em>
+<td><strong>SCHED_OTHER</strong>
+<td><strong>SCHED_OTHER</strong>
+
+
+</Table>
+
+<Table>
+<tr><td>
+</Table>
+</h2>
+</a><p>
+<pre>
+int <strong>pthread_attr_destroy</strong>(pthread_attr_t *attr);
+</pre>
+<dl>
+<dt><dd> Destroy the thread creation attribute
+</dl>
+<p>
+<pre>int <strong>pthread_attr_getdetachstate</strong>(const pthread_attr_t *attr,
+                                int *detachstate);
+</pre>
+<dl>
+<dt><dd> Get the <em>detachstate</em> from the thread creation attribute
+</dl>
+<p>
+<pre>int <strong>pthread_attr_getinheritsched</strong>(pthread_attr_t *attr,
+                                 int *inheritsched);
+</pre>
+<dl>
+<dt><dd> Get the <em>inheritsched</em> attribute.
+</dl>
+<p>
+<pre>int <strong>pthread_attr_getschedparam</strong>(const pthread_attr_t *attr,
+                               struct sched_param *param);
+</pre>
+<dl>
+<dt><dd> Get the <em>schedparam</em> attribute from the thread creation attribute. <strong>SCHED_OTHER</strong> with the thread priority is returned.
+</dl>
+<p>
+<pre>int <strong>pthread_attr_init</strong>(pthread_attr_t *attr);
+</pre>
+<dl>
+<dt><dd> Initialize the thread creation attribute
+</dl>
+<p>
+<pre>int <strong>pthread_attr_setdetachstate</strong>(pthread_attr_t *attr,
+                                int detachstate);
+</pre>
+<dl>
+<dt><dd> Set the <em>detachstate</em> in the thread creation attribute to one of <strong>PTHREAD_CREATE_JOINABLE</strong> or <strong>PTHREAD_CREATE_DETACHED</strong>.
+</dl>
+<p>
+<pre>int <strong>pthread_attr_setinheritsched</strong>(pthread_attr_t *attr,
+                                 int inheritsched);
+</pre>
+<dl>
+<dt><dd> Set the <em>inheritsched</em> attribute to one of <strong>PTHREAD_EXPLICIT_SCHED</strong> or <strong>PTHREAD_INHERIT_SCHED</strong>.
+</dl>
+<p>
+<pre>int <strong>pthread_attr_setschedparam</strong>(pthread_attr_t *attr,
+                               const struct sched_param *param);
+</pre>
+<dl>
+<dt><dd> Set the scheduling parameters in the thread creation attribute. Set only a policy of <strong>SCHED_OTHER</strong> with priority &lt;= <strong>PTHREAD_PRIO_MAX</strong> and priority &gt;= <strong>PTHREAD_PRIO_MIN</strong>.
+</dl>
+<p>
+<a name="302436">
+<h2> Thread Management</h2>
+</a><pre>int <strong>pthread_clear_exit_np</strong>(void);
+</pre>
+<dl>
+<dt><dd> Clear the current exit status and exiting state of the thread.
+<dt><dd> This function is not portable.
+</dl>
+<p>
+<pre>int <strong>pthread_create</strong>(pthread_t *thread, const pthread_attr_t *attr,
+                   void *(*start_routine)(void *), void *arg);
+</pre>
+<dl>
+<dt><dd> Create a thread with the specified thread attributes. Attribute of <strong>NULL</strong> indicates default attributes. 
+</dl>
+<em>The AS/400 implementation does not set a hard limit on the number of threads that can be created. <strong>PTHREAD_THREADS_MAX</strong> macro is implemented as a function call, and will return different values depending on the administrative setting of the maximum number of threads for the process. The default is NO MAX and has the numeric value of 2147483647 (0x7FFFFFFF). Realistically, the number of threads is limited by the amount of storage available to the job.</em><p>
+<p>
+<pre>int <strong>pthread_delay_np</strong>(const struct timespec *interval);
+</pre>
+<dl>
+<dt><dd> Delay the calling thread for the time interval specified. 
+<dt><dd> This function is not portable.
+</dl>
+<p>
+<pre>int <strong>pthread_detach</strong>(pthread_t thread);
+</pre>
+<dl>
+<dt><dd> Set the <em>detachstate</em> of a thread to <strong>PTHREAD_CREATE_DETACHED</strong>, allowing resources to be freed if/when the thread terminates.
+</dl>
+<p>
+<pre>int <strong>pthread_equal</strong>(pthread_t thread1, pthread_t thread2);
+</pre>
+<dl>
+<dt><dd> Compare two Pthread handles
+</dl>
+<p>
+<pre>void <strong>pthread_exit</strong>(void *status);
+</pre>
+<dl>
+<dt><dd> Terminate the calling thread and provide <em>status</em> to any joiners
+</dl>
+<p>
+<pre>int <strong>pthread_extendedjoin_np</strong>(pthread_t thread, void **status,
+                            pthread_joinoption_np_t *options);
+</pre>
+<dl>
+<dt><dd> Provides an extension to the normal pthread_join() semantics. Allow the application to specify options like the amount of time before time-out occurs, or whether the API should do an implicit detach operation or not.
+<dt><dd> This function is not portable.
+</dl>
+<p>
+<pre>int <strong>pthread_getconcurrency</strong>(void);
+</pre>
+<dl>
+<dt><dd> Get the concurrency level set for the process.
+<dt><dd> The concurrency level is not used by the OS/400 implementation.
+</dl>
+<p>
+<pre>void <strong>pthread_getpthreadoption_np</strong>(pthread_option_np_t *option);
+</pre>
+<dl>
+<dt><dd> Get the pthreads run-time option value for the specified option. The specified option must be one of: <strong>PTHREAD_OPTION_POOL_NP</strong>, <strong>PTHREAD_OPTION_POOL_CURRENT_NP</strong>, <strong>PTHREAD_OPTION_THREAD_CAPABLE_NP</strong>.
+</dl>
+<p>
+<pre>int <strong>pthread_getschedparam</strong>(pthread_t thread, int *policy,
+                          struct sched_param *param);
+</pre>
+<dl>
+<dt><dd> Get the scheduling parameters of the specified thread. <strong>SCHED_OTHER</strong> with the thread priority is returned.
+</dl>
+<p>
+<pre>pthread_id_np_t <strong>pthread_getthreadid_np</strong>(void);
+</pre>
+<dl>
+<dt><dd> Get the calling threads unique 64 bit integral thread id in two 32 bit integers. 
+<dt><dd> This function is not portable.
+</dl>
+<p>
+<pre>int <strong>pthread_getunique_np</strong>(pthread_t thread, pthread_id_np_t *id);
+</pre>
+<dl>
+<dt><dd> Get the target threads unique 64 bit integral thread id in two 32 bit integers. 
+<dt><dd> This function is not portable.
+</dl>
+<p>
+<pre>int <strong>pthread_is_multithreaded_np</strong>(pthread_t thread, void **status);
+</pre>
+<dl>
+<dt><dd> Returns true (&gt;0) if there is more than one thread in the process, false (0) otherwise. Adding 1 to the number returned represents the total number of threads in the process at the time of the call.
+<dt><dd> This function is not portable.
+</dl>
+<p>
+<pre>int <strong>pthread_join</strong>(pthread_t thread, void **status);
+</pre>
+<dl>
+<dt><dd> Wait for a thread to terminate, return its status and free its resources.
+</dl>
+<em>If the target thread was canceled, <strong>PTHREAD_CANCELED</strong> will be returned as its status. If the target thread ended as a result of an unhandled OS/400 exception or other proprietary OS/400 mechanism, the status of <strong>PTHREAD_EXCEPTION_NP</strong> will be returned.</em><p>
+<p>
+<pre>int <strong>pthread_join_np</strong>(pthread_t thread, void **status);
+</pre>
+<dl>
+<dt><dd> Wait for a thread to terminate, return its status and leave its resources available. 
+<dt><dd> This function is not portable.
+<dt><dd> If the target thread was canceled, PTHREAD_CANCELED will be returned as its status. If the target thread ended as a result of an unhandled OS/400 exception or other proprietary OS/400 mechanism, the status of PTHREAD_EXCEPTION_NP will be returned.
+</dl>
+<p>
+<pre>int <strong>pthread_once</strong>(pthread_once_t *once_control,
+                 void (*init_routine)(void));
+</pre>
+<dl>
+<dt><dd> Perform one time initialization if once_control is equal to <strong>PTHREAD_ONCE_INIT</strong>.
+</dl>
+<p>
+<pre>pthread_t <strong>pthread_self</strong>(void);
+</pre>
+<dl>
+<dt><dd> Return the Pthread handle of the calling thread.
+</dl>
+<p>
+<pre>int <strong>pthread_setconcurrency</strong>(void);
+</pre>
+<dl>
+<dt><dd> Set the concurrency level set for the process.
+<dt><dd> The concurrency level is not used by the OS/400 implementation.
+</dl>
+<p>
+<pre>void <strong>pthread_setpthreadoption_np</strong>(pthread_option_np_t *option);
+</pre>
+<dl>
+<dt><dd> Set the pthreads run-time options value or take action for the specified option. The specified option must be one of: <strong>PTHREAD_OPTION_POOL_NP</strong>. 
+</dl>
+<p>
+<pre>int <strong>pthread_setschedparam</strong>(pthread_t thread, int policy,
+                          const struct sched_param *param);
+</pre>
+<dl>
+<dt><dd> Set the scheduling parameters of the specified thread. Set only a policy of <strong>SCHED_OTHER</strong> with priority &lt;= <strong>PTHREAD_PRIO_MAX</strong> and priority &gt;= <strong>PTHREAD_PRIO_MIN</strong>.
+</dl>
+<p>
+<pre>int <strong>sched_yield</strong>(void);
+</pre>
+<dl>
+<dt><dd> Yield the processor to an active, ready to run thread of the same or higher priority.
+</dl>
+<p>
+<a name="302442">
+<h2> Thread Cancelation</h2>
+</a> 
+<Table Border="3">
+<caption></caption>
+<tr><th>Cancel State
+<th> Cancel Type
+<th> Cancelation Action
+
+<tr><td><strong>PTHREAD_CANCEL_ENABLE</strong>
+<td><strong>PTHREAD_CANCEL_ASYNCHRONOUS</strong>
+<td> Cancel the thread immediately and asynchronously
+
+<tr><td><strong>PTHREAD_CANCEL_ENABLE</strong>
+<td><strong>PTHREAD_CANCEL_DEFERRED</strong>
+<td> defer cancelation until a cancelation point is encountered
+
+<tr><td><strong>PTHREAD_CANCEL_DISABLE</strong>
+<td><strong>PTHREAD_CANCEL_ASYNCHRONOUS</strong>
+<td> defer cancelation until the cancel state changed to enabled
+
+<tr><td><strong>PTHREAD_CANCEL_DISABLE</strong>
+<td><strong>PTHREAD_CANCEL_DEFERRED</strong>
+<td> defer cancelation until the cancel state changed to enabled
+
+
+</Table>
+
+<Table>
+<tr><td>
+</Table>
+<p>
+<em>The default thread cancelation action is `defer cancelation until a cancelation point'. i.e. cancel state equal to <strong>PTHREAD_CANCEL_ENABLE</strong>, cancel type equal to <strong>PTHREAD_CANCEL_DEFERRED</strong>.</em><p>
+The following functions are cancelation points: <strong>pthread_join</strong>(), <strong>pthread_join_np</strong>(), <strong>pthread_testcancel</strong>(), <strong>pthread_cond_wait</strong>(), <strong>pthread_cond_timedwait</strong>(), <strong>pthread_delay_np</strong>().<p>
+<p>
+<pre>int <strong>pthread_cancel</strong>(pthread_t thread);
+</pre>
+<dl>
+<dt><dd> Cancel the specified thread.
+</dl>
+<em>pthread_cancel() makes status of <strong>PTHREAD_CANCELED</strong> available as the target threads exit status. </em><p>
+<dl><dl>
+<dt><dd>It is recommended that your application not use asynchronous thread cancelation via the pthread_setcanceltype() function. See the common user errors section of this document for more information.</dl>
+</dl><p>
+<pre>void <strong>pthread_cleanup_peek_np</strong>(pthread_cleanup_entry_np_t *top);
+</pre>
+<dl>
+<dt><dd> Retrieve the cleanup handler on the top of the cancelation cleanup stack without removing it
+<dt><dd> This function is not portable.
+</dl>
+<p>
+<pre>void <strong>pthread_cleanup_pop</strong>(int execute);
+</pre>
+<dl>
+<dt><dd> Pop a cleanup handler off of the cancelation cleanup stack and optionally execute it.
+</dl>
+<p>
+<pre>void <strong>pthread_cleanup_push</strong>(void (*routine)(void *), void *arg);
+</pre>
+<dl>
+<dt><dd> Push a cancelation cleanup handler onto the cancelation cleanup stack.
+</dl>
+<p>
+<pre>int <strong>pthread_getcancelstate_np</strong>(int *cancelState);
+</pre>
+<dl>
+<dt><dd> Get the threads current cancelation state. 
+<dt><dd> This function is not portable.
+</dl>
+<p>
+<pre>int <strong>pthread_setcancelstate</strong>(int state, int *oldstate);
+</pre>
+<dl>
+<dt><dd> Set the thread cancelation state of the specified thread to one of <strong>PTHREAD_CANCEL_ENABLE</strong> or <strong>PTHREAD_CANCEL_DISABLE</strong>.
+</dl>
+<p>
+<pre>int <strong>pthread_setcanceltype</strong>(int type, int *oldtype);
+</pre>
+<dl>
+<dt><dd> Set the thread cancelation type of the specified thread to one of <strong>PTHREAD_CANCEL_DEFERRED</strong> or <strong>PTHREAD_CANCEL_ASYNCHRONOUS</strong>.
+</dl>
+<em>It is recommended that your application not use asynchronous thread cancelation via the <strong>PTHREAD_CANCEL_ASYNCHRONOUS</strong> option of pthread_setcanceltype(). See the common user errors section of this document for more information.</em><p>
+<p>
+<pre>void <strong>pthread_testcancel</strong>(void);
+</pre>
+<dl>
+<dt><dd> Create a cancelation point for the calling thread. No operation if cancel state is equal to <strong>PTHREAD_CANCEL_DISABLE</strong>.
+</dl>
+<p>
+<pre>int <strong>pthread_test_exit_np</strong>(void **status);
+</pre>
+<dl>
+<dt><dd> Retrieve the current exit status of the thread. Returns one of <strong>PTHREAD_STATUS_ACTIVE_NP</strong> or <strong>PTHREAD_STATUS_EXIT_NP</strong>, sets the status if <strong>PTHREAD_STATUS_EXIT_NP</strong> is returned. 
+<dt><dd> This function is not portable.
+</dl>
+<p>
+<a name="302437">
+<h2> Thread Local Storage</h2>
+</a><pre>void *<strong>pthread_getspecific</strong>(pthread_key_t key);
+</pre>
+<dl>
+<dt><dd> Retrieve this threads value associated with the thread local storage key.
+</dl>
+<p>
+<pre>int <strong>pthread_key_create</strong>(pthread_key_t *key,
+                       void (*destructor)(void *));
+</pre>
+<dl>
+<dt><dd> Create a thread local storage key and possibly associate a destructor with it.
+</dl>
+<em>A maximum of <strong>PTHREAD_KEYS_MAX</strong> (256) thread local storage keys can be created in a process. When running data destructors, the destructor will be called a maximum of <strong>PTHREAD_DESTRUCTOR_ITERATIONS</strong> (4) times.</em><p>
+<p>
+<pre>int <strong>pthread_key_delete</strong>(pthread_key_t key);
+</pre>
+<dl>
+<dt><dd> Delete a thread local storage key
+</dl>
+<p>
+<pre>int <strong>pthread_setspecific</strong>(pthread_key_t key, const void *value);
+</pre>
+<dl>
+<dt><dd> Set this threads value associated with the thread local storage key.
+</dl>
+<p>
+<a name="302443">
+<h2> Mutex Attributes 
+<Table Border="3">
+<caption></caption>
+<tr><th>Attribute
+<th> Default value
+<th> supported values
+
+<tr><td><em>pshared</em>
+<td><strong>PTHREAD_PROCESS_PRIVATE</strong>
+<td><strong>PTHREAD_PROCESS_PRIVATE or PTHREAD_PROCESS_SHARED</strong>
+
+<tr><td>kind
+(non portable)
+<td><strong>PTHREAD_MUTEX_NONRECURSIVE_NP</strong>
+<td><strong>PTHREAD_MUTEX_NONRECURSIVE_NP</strong> or <strong>PTHREAD_MUTEX_RECURSIVE_NP</strong>
+
+<tr><td><em>name</em>
+(non portable)
+<td><strong>PTHREAD_DEFAULT_MUTEX_NAME_NP</strong> 
+"QP0WMTX UNNAMED"
+<td><strong>Any name 15 characters or less. If not terminated by a null character, name is truncated to 15 characters.</strong>
+
+<tr><td><em>type</em>
+<td><strong>PTHREAD_MUTEX_DEFAULT</strong> (<strong>PTHREAD_MUTEX_NORMAL</strong>)
+<td><strong>PTHREAD_MUTEX_DEFAULT</strong> or <strong>PTHREAD_MUTEX_NORMAL</strong> or <strong>PTHREAD_MUTEX_RECURSIVE</strong> or <strong>PTHREAD_MUTEX_ERRORCHECK</strong> or <strong>PTHREAD_MUTEX_OWNERTERM_NP</strong>
+The <strong>PTHREAD_MUTEX_OWNERTERM_NP</strong> attribute value is non portable
+
+
+</Table>
+
+<Table>
+<tr><td>
+</Table>
+</h2>
+</a><p>
+<pre>int <strong>pthread_mutexattr_destroy</strong>(pthread_mutexattr_t *attr);
+</pre>
+<dl>
+<dt><dd> Destroy the mutex attributes object.
+</dl>
+<p>
+<pre>int <strong>pthread_mutexattr_getkind_np</strong>(const pthread_mutexattr_t *attr,
+                                int *kind);
+</pre>
+<dl>
+<dt><dd> Get the <em>kind</em> attribute. 
+<dt><dd> This function is not portable.
+</dl>
+<p>
+<pre>int <strong>pthread_mutexattr_getname_np</strong>(const pthread_mutexattr_t *attr,
+                                 char *name);
+</pre>
+<dl>
+<dt><dd> Get the <em>name</em> attribute. 
+<dt><dd> This function is not portable.
+</dl>
+<p>
+<pre>int <strong>pthread_mutexattr_getpshared</strong>(const pthread_mutexattr_t *attr,
+                                 int *pshared);
+</pre>
+<dl>
+<dt><dd> Get the <em>pshared</em> attribute 
+</dl>
+<p>
+<pre>int <strong>pthread_mutexattr_gettype</strong>(pthread_mutexattr_t *attr, int *type);
+</pre>
+<dl>
+<dt><dd> Get the type attribute.
+</dl>
+<p>
+<pre>int <strong>pthread_mutexattr_init</strong>(pthread_mutexattr_t *attr);
+</pre>
+<dl>
+<dt><dd> Initialize the mutex attributes to the default values.
+</dl>
+<p>
+<pre>int <strong>pthread_mutexattr_setkind_np</strong>(const pthread_mutexattr_t *attr,
+                                 int kind);
+</pre>
+<dl>
+<dt><dd> Set the kind attribute to one of <strong>PTHREAD_MUTEX_NONRECURSIVE_NP</strong> or <strong>PTHREAD_MUTEX_RECURSIVE_NP</strong>. 
+<dt><dd> This function is not portable.
+</dl>
+<p>
+<pre>int <strong>pthread_mutexattr_setname_np</strong>(pthread_mutexattr_t *attr,
+                                 const char *name);
+</pre>
+<dl>
+<dt><dd> Set the <em>name</em> attribute to the null terminated string specified. 
+<dt><dd> This function is not portable.
+</dl>
+<p>
+<pre>int <strong>pthread_mutexattr_setpshared</strong>(pthread_mutexattr_t *attr,
+                                 int pshared);
+</pre>
+<dl>
+<dt><dd> Set the <em>pshared</em> attribute to one of <strong>PTHREAD_PROCESS_SHARED</strong> or <strong>PTHREAD_PROCESS_PRIVATE</strong>
+</dl>
+<p>
+<pre>int <strong>pthread_mutexattr_settype</strong>(pthread_mutexattr_t *attr, int type);
+</pre>
+<dl>
+<dt><dd> Set the type attribute to one of <strong>PTHREAD_MUTEX_DEFAULT</strong>, <strong>PTHREAD_MUTEX_NORMAL</strong>, <strong>PTHREAD_MUTEX_RECURSIVE</strong>, <strong>PTHREAD_MUTEX_ERRORCHECK</strong>, or <strong>PTHREAD_MUTEX_OWNERTERM_NP</strong>.
+<dt><dd> The <strong>PTHREAD_MUTEX_OWNERTERM_NP</strong> type is not portable.
+</dl>
+<p>
+<pre>int <strong>pthread_set_mutexattr_default_np</strong>(int kind);
+</pre>
+<dl>
+<dt><dd> Set the default <em>kind</em> attribute for the current process to one of <strong>PTHREAD_MUTEX_NONRECURSIVE_NP</strong> or <strong>PTHREAD_MUTEX_RECURSIVE_NP</strong>. All subsequent mutexes created in the same process will have the specified default kind attribute. It is recommended that you do not use this function.
+<dt><dd> This function is not portable.
+</dl>
+<p>
+<a name="302859">
+<h2> Mutexes</h2>
+</a><pre>int <strong>pthread_mutex_destroy</strong>(pthread_mutex_t *mutex);
+</pre>
+<dl>
+<dt><dd> Destroy the mutex.
+</dl>
+<p>
+<pre>int <strong>pthread_mutex_init</strong>(pthread_mutex_t *mutex,
+                       const pthread_mutexattr_t *attr);     OR
+pthread_mutex_t   mutex = <strong>PTHREAD_MUTEX_INITIALIZER</strong>;
+</pre>
+<dl>
+<dt><dd> Initialize the mutex using the attributes specified. Attribute of <strong>NULL</strong> or initialization with the <strong>PTHREAD_MUTEX_INITIALIZER</strong> indicates the default mutex attributes.
+</dl>
+<p>
+<pre>int <strong>pthread_mutex_lock</strong>(pthread_mutex_t *mutex);
+</pre>
+<dl>
+<dt><dd> Lock the mutex.
+</dl>
+<p>
+<pre>int <strong>pthread_mutex_timedlock_np</strong>(pthread_mutex_t *mutex,
+                               const struct timespec *deltatime);
+</pre>
+<dl>
+<dt><dd> Attempt to lock the mutex, time-out with the EBUSY error if the call waits for the delta time specified. 
+<dt><dd> This function is not portable.
+</dl>
+<p>
+<pre>int <strong>pthread_mutex_trylock</strong>(pthread_mutex_t *mutex);
+</pre>
+<dl>
+<dt><dd> Attempt to lock the mutex without blocking.
+</dl>
+<p>
+<pre>int <strong>pthread_mutex_unlock</strong>(pthread_mutex_t *mutex);
+</pre>
+<dl>
+<dt><dd> Unlock the mutex
+</dl>
+<p>
+<pre>int <strong>pthread_lock_global_np</strong>(void);
+</pre>
+<dl>
+<dt><dd> Lock a global mutex.
+<dt><dd> This function is not portable.
+</dl>
+<p>
+<pre>int <strong>pthread_unlock_global_np</strong>(void);
+</pre>
+<dl>
+<dt><dd> Unlock a global mutex.
+<dt><dd> This function is not portable.
+</dl>
+<p>
+<a name="327510">
+<h2> Condition Variable Attributes 
+<Table Border="3">
+<caption></caption>
+<tr><th>Attribute
+<th> Default value
+<th> supported values
+
+<tr><td><em>pshared</em>
+<td><strong>PTHREAD_PROCESS_PRIVATE</strong>
+<td><strong>PTHREAD_PROCESS_PRIVATE or PTHREAD_PROCESS_SHARED</strong>
+
+
+</Table>
+
+<Table>
+<tr><td>
+</Table>
+</h2>
+</a><p>
+<pre>int <strong>pthread_condattr_destroy</strong>(pthread_condattr_t *attr);
+</pre>
+<dl>
+<dt><dd> Destroy the named condition variable attributes object.
+</dl>
+<p>
+<pre>int <strong>pthread_condattr_init</strong>(pthread_condattr_t *attr);
+</pre>
+<dl>
+<dt><dd> Initialize a condition variable attributes object.
+</dl>
+<p>
+<pre>int <strong>pthread_condattr_getpshared</strong>(const pthread_condattr_t *attr,
+                                int *pshared);
+</pre>
+<dl>
+<dt><dd> Get the pshared attribute.
+</dl>
+<p>
+<pre>int <strong>pthread_condattr_setpshared</strong>(const pthread_condattr_t *attr,
+                                int pshared);
+</pre>
+<dl>
+<dt><dd> Set the pshared attribute to one of <strong>PTHREAD_PROCESS_PRIVATE</strong> or <strong>PTHREAD_PROCESS_SHARED</strong>.
+</dl>
+<p>
+<a name="302446">
+<h2> Condition Variables</h2>
+</a><pre>int <strong>pthread_cond_broadcast</strong>(pthread_cond_t *cond);
+</pre>
+<dl>
+<dt><dd> Wake up all waiters blocked on a condition.
+</dl>
+<p>
+<pre>int <strong>pthread_cond_destroy</strong>(pthread_cond_t *cond);
+</pre>
+<dl>
+<dt><dd> Destroy the condition variable.
+</dl>
+<p>
+<pre>int <strong>pthread_cond_init</strong>(pthread_cond_t *cond,
+                      const pthread_condattr_t *attr);     OR
+pthread_cond_t   cond = <strong>PTHREAD_COND_INITIALIZER</strong>;
+</pre>
+<dl>
+<dt><dd> Initialize the condition variable using the attributes specified. Attribute of <strong>NULL</strong> or initialization with the <strong>PTHREAD_COND_INITIALIZER</strong> indicates the default condition variable attributes.
+</dl>
+<p>
+<pre>int <strong>pthread_cond_signal</strong>(pthread_cond_t *cond);
+</pre>
+<dl>
+<dt><dd> Wake up at least one thread blocked on a condition.
+</dl>
+<p>
+<pre>int <strong>pthread_cond_timedwait</strong>(pthread_cond_t *cond,
+                           pthread_mutex_t *mutex,
+                           const struct timespec *abstime);
+</pre>
+<dl>
+<dt><dd> Go to sleep in a timed wait for a condition variable.
+</dl>
+<p>
+<pre>int <strong>pthread_cond_wait</strong>(pthread_cond_t *cond,
+                      pthread_mutex_t *mutex);
+</pre>
+<dl>
+<dt><dd> Go to sleep in a wait for a condition variable
+</dl>
+<p>
+<pre>int <strong>pthread_get_expiration_np</strong>(const struct timespec *delta,
+                              struct timespec *abstime);
+</pre>
+<dl>
+<dt><dd> Convert a delta timespec to an absolute timespec for possible subsequent use in pthread_cond_timedwait.
+<dt><dd> This function is not portable.
+</dl>
+<p>
+<a name="370264">
+<h2> Read/Write Lock Attributes 
+<Table Border="3">
+<caption></caption>
+<tr><th>Attribute
+<th> Default value
+<th> supported values
+
+<tr><td><em>pshared</em>
+<td><strong>PTHREAD_PROCESS_PRIVATE</strong>
+<td><strong>PTHREAD_PROCESS_PRIVATE or PTHREAD_PROCESS_SHARED</strong>
+
+
+</Table>
+
+<Table>
+<tr><td>
+</Table>
+</h2>
+</a><pre>int <strong>pthread_rwlockattr_destroy</strong>(pthread_rwlockattr_t *attr);
+</pre>
+<dl>
+<dt><dd> Destroy the named read/write lock attributes object.
+</dl>
+<p>
+<pre>int <strong>pthread_rwlockattr_init</strong>(pthread_rwlockattr_t *attr);
+</pre>
+<dl>
+<dt><dd> Initialize a read/write lock attributes object.
+</dl>
+<p>
+<pre>int <strong>pthread_rwlockatttr_getpshared</strong>(const pthread_rwlockattr_t *attr,
+                                   int *pshared);
+</pre>
+<dl>
+<dt><dd> Get the pshared attribute.
+</dl>
+<p>
+<pre>int <strong>pthread_rwlockatttr_setpshared</strong>(pthread_rwlockattr_t *attr,
+                                   int pshared);
+</pre>
+<dl>
+<dt><dd> Set the pshared attribute to one of <strong>PTHREAD_PROCESS_PRIVATE</strong> or <strong>PTHREAD_PROCESS_SHARED</strong>.
+</dl>
+<p>
+<a name="370282">
+<h2> Read/Write Lock</h2>
+</a><pre>int <strong>pthread_rwlock_destroy</strong>(pthread_rwlock_t *rwlock);
+</pre>
+<dl>
+<dt><dd> Destroy the read/write lock.
+</dl>
+<p>
+<pre>int <strong>pthread_rwlock_init</strong>(pthread_rwlock_t *rwlock,
+                        const pthread_rwlockattr_t *attr);      OR
+pthread_rwlock_t rwlock = PTHREAD_RWLOCK_INITIALIZER;
+</pre>
+<dl>
+<dt><dd> Initialize the read/write lock using the attributes specified. Attribute of <strong>NULL</strong> or initialization with the <strong>PTHREAD_RWLOCK_INITIALIZER</strong> indicates the default read/write lock attributes.
+</dl>
+<p>
+<pre>int <strong>pthread_rwlock_rdlock</strong>(pthread_rwlock_t *rwlock);
+</pre>
+<dl>
+<dt><dd> Get a shared read lock on the read/write lock.
+</dl>
+<p>
+<pre>int <strong>pthread_rwlock_timedrdlock_np</strong>(pthread_rwlock_t *rwlock,
+                                  const struct timespec *deltatime);
+</pre>
+<dl>
+<dt><dd> Attempt to get a shared read lock on the read/write lock, time-out with the <strong>EBUSY</strong> error if the call waits for the delta time specified.
+<dt><dd> This function is not portable.
+</dl>
+<p>
+<pre>int <strong>pthread_rwlock_timedwrlock_np</strong>(pthread_rwlock_t *rwlock,
+                                  const struct timespec *deltatime);
+</pre>
+<dl>
+<dt><dd> Attempt to get an exclusive write lock on the read/write lock, time-out with the <strong>EBUSY</strong> error if the call waits for the delta time specified.
+<dt><dd> This function is not portable.
+</dl>
+<p>
+<pre>int <strong>pthread_rwlock_tryrdlock_np</strong>(pthread_rwlock_t *rwlock);
+</pre>
+<dl>
+<dt><dd> Attempt to get a shared read lock on the read/write lock, if the lock is currently held by another thread, return <strong>EBUSY</strong>.
+</dl>
+<p>
+<pre>int <strong>pthread_rwlock_trywrlock_np</strong>(pthread_rwlock_t *rwlock);
+</pre>
+<dl>
+<dt><dd> Attempt to get an exclusive write lock on the read/write lock, if the lock is currently held by another thread, return <strong>EBUSY</strong>.
+</dl>
+<p>
+<pre>int <strong>pthread_rwlock_unlock</strong>(pthread_rwlock_t *rwlock);
+</pre>
+<dl>
+<dt><dd> Unlock the shared read or exclusive write lock held by the calling thread on the read/write lock.
+</dl>
+<p>
+<pre>int <strong>pthread_rwlock_wrlock</strong>(pthread_rwlock_t *rwlock);
+</pre>
+<dl>
+<dt><dd> Get an exclusive write lock on the read/write lock.
+</dl>
+<p>
+<p>
+<a name="340144">
+<h2> Signals</h2>
+</a><pre>int <strong>pthread_kill</strong>(pthread_t thread, int sig)
+</pre>
+<dl>
+<dt><dd> Deliver the signal sig to the thread specified.
+</dl>
+<p>
+<pre>int <strong>pthread_sigmask</strong>(int how, const sigset_t *set, sigset_t *oset);
+</pre>
+<dl>
+<dt><dd> Examine or change the calling threads signal blocking mask.
+</dl>
+<p>
+<pre>int <strong>pthread_signal_to_cancel_np</strong>(sigset_t *set, pthread_t *thread);
+</pre>
+<dl>
+<dt><dd> Deliver a cancel to the target thread when the first of the specified signals arrive.
+<dt><dd> This function is not portable.
+</dl>
+<p>
+<a name="306462">
+<h2> Unsupported functions</h2>
+</a><dl>
+<dt><dd> The following functions are unsupported. They will fail with the ENOSYS error.
+<dt><dd> 
+</dl>
+<pre>int <strong>pthread_atfork</strong>(void (*prepare)(void),
+                   void (*parent)(void),
+                   void (*child)(void));
+int <strong>pthread_atfork_np</strong>(int *userstate,
+                      void (*prepare)(void),
+                      void (*parent)(void),
+                      void (*child)(void));
+int <strong>pthread_attr_getguardsize</strong>(const pthread_attr_t *attr,
+                              size_t *guardsize);
+int <strong>pthread_attr_getschedpolicy</strong>(pthread_attr_t *attr,
+                                int *policy);
+int <strong>pthread_attr_getscope</strong>(pthread_attr_t *attr,
+                          int *contentionscope);
+int <strong>pthread_attr_getstackaddr</strong>(const pthread_attr_t *attr,
+                              void **stackaddr);
+int <strong>pthread_attr_getstacksize</strong>(const pthread_attr_t *attr,
+                              size_t *stacksize);
+int <strong>pthread_attr_setguardsize</strong>(pthread_attr_t *attr,
+                              size_t guardsize);
+int <strong>pthread_attr_setschedpolicy</strong>(pthread_attr_t *attr,
+                                int policy);
+int <strong>pthread_attr_setscope</strong>(pthread_attr_t *attr,
+                          int contentionscope);
+int <strong>pthread_attr_setstackaddr</strong>(pthread_attr_t *attr,
+                              void *stackaddr);
+int <strong>pthread_attr_setstacksize</strong>(pthread_attr_t *attr,
+                              size_t stacksize);
+int <strong>pthread_mutexattr_getprioceiling</strong>(const pthread_mutexattr_t *attr,
+                                     int *prioceiling);
+int <strong>pthread_mutexattr_getprotocol</strong>(const pthread_mutexattr_t *attr,
+                                  int *protocol);
+int <strong>pthread_mutexattr_setprioceiling</strong>(pthread_mutexattr_t *attr,
+                                     int prioceiling);
+int <strong>pthread_mutexattr_setprotocol</strong>(pthread_mutexattr_t *attr,
+                                  int protocol);
+int <strong>pthread_mutex_getprioceiling</strong>(const pthread_mutex_t *mutex,
+                                 int *prioceiling);
+int <strong>pthread_mutex_setprioceiling</strong>(pthread_mutex_t *mutex,
+                                 int prioceiling, int *oldceiling);
+
+</pre>
+<a name="315506">
+<h2> Feature Test Macros 
+<Table Border="3">
+<caption></caption>
+<tr><th>Constant
+<th> Description
+
+<tr><td><strong>_POSIX_THREADS</strong>
+<td>Base threads
+
+<tr><td><strong>_POSIX_THREAD_ATTR_STACKADDR</strong>
+<td>Stack address attribute. 
+Not present in the OS/400 implementation.
+
+<tr><td><strong>_POSIX_THREAD_ATTR_STACKSIZE</strong>
+<td>Stack size attribute. 
+Not present in the OS/400 implementation.
+
+<tr><td><strong>_POSIX_THREAD_PRIORITY_SCHEDULING</strong>
+<td>Thread priority scheduling. 
+Not present in the OS/400 implementation.
+
+<tr><td><strong>_POSIX_THREAD_PRIO_INHERIT</strong>
+<td>Mutex priority inheritance. 
+Not present in the OS/400 implementation.
+
+<tr><td><strong>_POSIX_THREAD_PRIO_PROTECT</strong>
+<td>Mutex priority ceiling. 
+Not present in the OS/400 implementation.
+
+<tr><td><strong>_POSIX_THREAD_PROCESS_SHARED</strong>
+<td>Synchronization primitives may be shared between processes. 
+
+
+</Table>
+
+<Table>
+<tr><td>
+</Table>
+</h2>
+</a>The OS/400 implementation of pthreads defines the <strong>_POSIX_THREADS</strong> and <strong>_POSIX_THREAD_PROCESS_SHARED</strong> feature test macros.<p>
+<a name="359466">
+<h2> Header files</h2>
+</a><ul><li>The &lt;<strong>pthread.h</strong>&gt; header file. See <a href="concept1.htm#293716" tppabs="http://web.ss.pub.ro/%7Ebogdan/APC/2000/uguide/concept1.htm#293716">Header files for Pthread functions</a>
+<li>The &lt;<strong>sched.h</strong>&gt; header file. See <a href="concept1.htm#293716" tppabs="http://web.ss.pub.ro/%7Ebogdan/APC/2000/uguide/concept1.htm#293716">Header files for Pthread functions</a>
+</ul>
+<hr><br>
+ 
+<a href="concep32.htm" tppabs="http://web.ss.pub.ro/%7Ebogdan/APC/2000/uguide/concep32.htm">[Prev]</a> <a href="document.htm" tppabs="http://web.ss.pub.ro/%7Ebogdan/APC/2000/uguide/document.htm">[Contents]</a> <a href="users-g1.htm" tppabs="http://web.ss.pub.ro/%7Ebogdan/APC/2000/uguide/users-g1.htm">[Next]</a> 
+
+
+<br>
+
+
+<i>Copyright &#169; 1998, IBM Corporation.   All rights
+reserved.</i>
+<br>
+Comments? Contact <address><a href="mailto:rchthrds@us.ibm.com">rchthrds@us.ibm.com</a></address>
+<!-- This file was created with Quadralay WebWorks Publisher 3.0.8 -->
+<!-- -->
+<!-- Last updated: 03/02/98 10:38:54 -->
+</body>
+</html>
+
