@@ -11,6 +11,8 @@ static char SPEEDTYPE_NAMES[2] = { 'U', 'A' };
 
 static char ROADBLOCKTYPE_NAMES[3] = { 'P', 'S', 'D'};
 
+static size_t *kilometers;
+
 void dump_simulation_info (const simulation_info *info) {
   size_t i;
   printf(
@@ -26,13 +28,27 @@ void dump_simulation_info (const simulation_info *info) {
 }
 
 void*
-thread_function (void *arg) {
+biker_callback (void *arg) {
   int i;
-  for (i=0; i<20; i++) {
-    printf("Thread says hi!\n");
-    sleep(1);
-  }
+  biker_t *biker = (biker_t*)arg;
+ 
+
   return NULL;
+}
+
+int
+advance_kilometer (biker_t *biker, size_t road_capacity) {
+  while(1) {
+    /* LOCK */
+    if (kilometers[biker->current_km+1].bikers_num < road_capacity) {
+      kilometers[biker->current_km].bikers_num--;
+      kilometers[++biker->current_km].bikers_num++;
+      break;
+    }
+    /* UNLOCK */
+    /* YIELD */
+  }
+  /* UNLOCK */
 }
 
 int
@@ -50,6 +66,8 @@ main (int argc, char **argv) {
     puts("NOT");
     return EXIT_FAILURE;
   }
+  
+  kilometers = malloc(sizeof(size_t)*info->road_total_length);
 
   dump_simulation_info(&info);
 
@@ -63,6 +81,8 @@ main (int argc, char **argv) {
     return EXIT_FAILURE;
   }
 
+
+  free(kilometers);
   return EXIT_SUCCESS;
 
 }

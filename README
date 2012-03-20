@@ -2,7 +2,7 @@
 EP1 de MAC0438-2012.
 
 TODO list:
-- Implementar vetor de quilômetros.
+- Implementar vetor de quilômetros. OK
 - Implementar ciclistas.
 - Implementar thread "reporter" que notifica os estado da corrida a cada minuto.
 - Implementar checkpoints.
