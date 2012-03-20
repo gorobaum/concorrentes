@@ -6,7 +6,7 @@ OBJ_DIR = .temp
 #OUTPUT_DIR = bin
 
 CC = gcc
-CFLAGS = -ansi -pedantic -Wall -O2 $(FLAGS)
+CFLAGS = -ansi -pedantic -Wall -O0 $(FLAGS)
 
 #OUTPUT = bin/$(PROG_NAME)
 OUTPUT = $(PROG_NAME)
