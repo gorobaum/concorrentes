@@ -45,13 +45,14 @@ advance_kilometer (biker_t *biker, size_t road_capacity) {
 
 void*
 biker_callback (void *arg) {
-  arg_t *args = (arg_t*)args;
+  arg_t   *args = (arg_t*)args;
+  biker_t *biker = args->biker;
   
-  while (args->biker->current_km <= args->road_total_length) {
-    args->biker->current_meter += 
-      args->biker->speed[kilometers[args->biker->current_km].type];
-    if (args->biker->current_meter >= 1000.0 ) {
-      advance_kilometer (args->biker, args->road_total_length);
+  while (biker->current_km <= args->road_total_length) {
+    biker->current_meter += 
+      biker->speed[kilometers[biker->current_km].type];
+    if (biker->current_meter >= 1000.0 ) {
+      advance_kilometer (biker, args->road_total_length);
     }
   }
 
@@ -63,7 +64,7 @@ main (int argc, char **argv) {
 
   pthread_t       biker;
   simulation_info info;
-  arg_t arg;
+  arg_t           args;
 
   if (argc < 2) {
     puts("-.-");
@@ -82,7 +83,7 @@ main (int argc, char **argv) {
   dump_simulation_info(&info);
 
 
-  if (pthread_create(&biker, NULL, biker_callback, (void*)&arg)) {
+  if (pthread_create(&biker, NULL, biker_callback, (void*)&args)) {
     printf("error creating thread.");
     return EXIT_FAILURE;
   }
