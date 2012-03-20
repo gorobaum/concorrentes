@@ -18,9 +18,11 @@ typedef enum {
   DOWN
 } roadblock_t;
 
+char ROADBLOCKTYPE_NAMES[3] = { 'P', 'S', 'D'};
+
 typedef struct {
-  roadblock_t block_type;
-  size_t      block_length;
+  roadblock_t type;
+  size_t      length;
 } roadblock_info;
 
 typedef struct {
