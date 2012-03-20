@@ -15,7 +15,7 @@ include objs.makefile
 
 #$(PROG_NAME): $(OBJ_DIR) $(OUTPUT_DIR) $(OBJS)
 $(PROG_NAME): $(OBJ_DIR) $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(OUTPUT)
+	$(CC) $(OBJS) $(CFLAGS) -o $(OUTPUT)
 
 $(OBJ_DIR):
 	mkdir $@
