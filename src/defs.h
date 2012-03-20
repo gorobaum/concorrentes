@@ -10,15 +10,11 @@ typedef enum {
   RANDOMSPEED
 } biker_speed_t;
 
-char SPEEDTYPE_NAMES[2] = { 'U', 'A' };
-
 typedef enum {
   PLANE,
   UP,
   DOWN
 } roadblock_t;
-
-char ROADBLOCKTYPE_NAMES[3] = { 'P', 'S', 'D'};
 
 typedef struct {
   roadblock_t type;
