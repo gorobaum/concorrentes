@@ -22,7 +22,7 @@ typedef struct {
 } kilometer;
 
 typedef struct {
-  int     current_km;
+  size_t  current_km;
   double  current_meter,
           speed[3]; /* METERS/MIN */
 } biker_t;
