@@ -13,6 +13,7 @@ static simulation_info  info;
 static arg_t            args;
 static kilometer        *kilometers;
 static biker_t          biker;
+static pthread_mutex_t  road_mutex;
 
 /*  0 -> success
  * -1 -> failure */
@@ -115,15 +116,19 @@ int
 advance_kilometer (biker_t *biker, size_t road_capacity) {
   while(1) {
     /* LOCK */
+    pthread_mutex_lock(&road_mutex);
     if (kilometers[biker->current_km+1].bikers_num < road_capacity) {
       kilometers[biker->current_km].bikers_num--;
       kilometers[++biker->current_km].bikers_num++;
       break;
     }
     /* UNLOCK */
+    pthread_mutex_unlock(&road_mutex);
     /* YIELD */
+    /*sched_yield();*/
   }
   /* UNLOCK */
+  pthread_mutex_unlock(&road_mutex);
   return 1;
 }
 
@@ -151,8 +156,13 @@ int
 RACErun () {
   pthread_t biker_thread;
 
+  if (pthread_mutex_init(&road_mutex, NULL)) {
+    puts("error creating mutex.");
+    return -1;
+  }
+
   if (pthread_create(&biker_thread, NULL, biker_callback, (void*)&args)) {
-    printf("error creating thread.");
+    puts("error creating thread.");
     return -1;
   }
 
@@ -162,6 +172,8 @@ RACErun () {
     printf("error joining thread.");
     return -1;
   }
+
+  pthread_mutex_destroy(&road_mutex);
 
   return 0;
 }
