@@ -10,8 +10,6 @@ typedef enum {
   RANDOMSPEED
 } biker_speed_t;
 
-char SPEEDTYPE_NAMES[2] = { 'U', 'A' };
-
 typedef enum {
   PLANE,
   UP,
@@ -19,12 +17,29 @@ typedef enum {
 } roadblock_t;
 
 typedef struct {
-  roadblock_t block_type;
-  size_t      block_length;
+  size_t      bikers_num;
+  roadblock_t type;
+} kilometer;
+
+typedef struct {
+  size_t  current_km;
+  double  current_meter,
+          speed[3]; /* METERS/MIN */
+} biker_t;
+
+typedef struct {
+  biker_t *biker;
+  size_t  road_total_length,
+          road_capacity;
+} arg_t;
+
+typedef struct {
+  roadblock_t type;
+  size_t      length;
 } roadblock_info;
 
 typedef struct {
-  size_t          biker_num,
+  size_t          bikers_num,
                   road_capacity,
                   road_total_length,
                   blocks_num;
