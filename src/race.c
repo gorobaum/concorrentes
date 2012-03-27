@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <unistd.h>
+#include "defs.h"
 #include "race.h"
-#include "load.h"
 
 static const char SPEEDTYPE_NAMES[2] = { 'U', 'A' };
 static const char ROADBLOCKTYPE_NAMES[3] = { 'P', 'S', 'D'};
@@ -12,13 +12,64 @@ static const char ROADBLOCKTYPE_NAMES[3] = { 'P', 'S', 'D'};
 static simulation_info  info;
 static arg_t            args;
 static kilometer        *kilometers;
+static biker_t          biker;
+
+/*  0 -> success
+ * -1 -> failure */
+static int
+load_simulation_info (const char* filename) {
+  FILE    *input;
+  char    buffer[BUFFER_SIZE];
+  size_t  i, total_length;
+
+  input = fopen(filename, "r");
+  if (!input) return -1;
+  /* biker num */
+  fgets(buffer, BUFFER_SIZE, input);
+  sscanf(buffer, "%lu", &info.bikers_num);
+  /* road capacity */
+  fgets(buffer, BUFFER_SIZE, input);
+  sscanf(buffer, "%lu", &info.road_capacity);
+  /* speed type */
+  fgets(buffer, BUFFER_SIZE, input);
+  switch (buffer[0]) {
+    case 'U': info.speed_type = UNIFORMSPEED; break;
+    case 'A': info.speed_type = RANDOMSPEED; break;
+    default: break;
+  }
+  /* road length */
+  fgets(buffer, BUFFER_SIZE, input);
+  sscanf(buffer, "%lu", &info.road_total_length);
+  /* road blocks */
+  for (i = 0, total_length = 0;
+       total_length < info.road_total_length && i < MAX_BLOCKS;
+       total_length += info.blocks[i++].length) {
+    /* block type */
+    fgets(buffer, BUFFER_SIZE, input);
+    switch (buffer[0]) {
+      case 'P': info.blocks[i].type = PLANE; break;
+      case 'S': info.blocks[i].type = UP; break;
+      case 'D': info.blocks[i].type = DOWN; break;
+      default: break;
+    }
+    /* block length */
+    fgets(buffer, BUFFER_SIZE, input);
+    sscanf(buffer, "%lu", &info.blocks[i].length);
+  }
+
+  info.blocks_num = i;
+
+  fclose(input);
+  input = NULL;
+
+  return 0;
+}
 
 int
 RACEload (const char *inputfile) {
   size_t          i, j, k;
-  biker_t         biker;
 
-  if (load_simulation_info(inputfile, &info)) {
+  if (load_simulation_info(inputfile)) {
     puts("NOT");
     return -1;
   }
@@ -82,10 +133,12 @@ biker_callback (void *arg) {
   biker_t *biker;
   
   biker = args->biker;
+  puts("Biker runs!");
   while (biker->current_km < args->road_total_length) {
     biker->current_meter += 
       biker->speed[kilometers[biker->current_km].type];
     if (biker->current_meter >= 1000.0 ) {
+      /*printf("Advanced: %lu\n", biker->current_km);*/
       advance_kilometer (biker, args->road_total_length);
       biker->current_meter = 0.0;
     }
