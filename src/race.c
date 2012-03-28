@@ -66,6 +66,25 @@ load_simulation_info (const char* filename) {
   return 0;
 }
 
+static void
+BIKERinit_speed (double speed[3], biker_speed_t speed_type) {
+  speed[0] = speed[1] = speed[2] = 50.0;
+}
+
+static biker_t*
+BIKERmake_all (size_t bikers_num, biker_speed_t speed_type) {
+  size_t  i;
+  biker_t *bikers = NULL;
+  bikers = (biker_t*)malloc(sizeof(*bikers)*bikers_num);
+  for (i = 0; i < bikers_num; i++) {
+    bikers[i].id = i;
+    bikers[i].current_km = -1;
+    bikers[i].current_meter = 0;
+    BIKERinit_speed(bikers[i].speed, speed_type);
+  }
+  return bikers;
+}
+
 int
 RACEload (const char *inputfile) {
   size_t          i, j, k;
