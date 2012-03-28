@@ -12,7 +12,7 @@ static const char ROADBLOCKTYPE_NAMES[3] = { 'P', 'S', 'D'};
 static simulation_info  info;
 static arg_t            args;
 static kilometer        *kilometers;
-static biker_t          biker;
+static biker_t          *bikers;
 static pthread_mutex_t  road_mutex;
 
 /*  0 -> success
@@ -79,7 +79,7 @@ BIKERmake_all (size_t bikers_num, biker_speed_t speed_type) {
   for (i = 0; i < bikers_num; i++) {
     bikers[i].id = i;
     bikers[i].current_km = -1;
-    bikers[i].current_meter = 0;
+    bikers[i].current_meter = 1000;
     BIKERinit_speed(bikers[i].speed, speed_type);
   }
   return bikers;
@@ -94,9 +94,10 @@ RACEload (const char *inputfile) {
     return -1;
   }
 
-  biker.current_km = 0;
+  bikers = BIKERmake_all(info.bikers_num, info.speed_type);
+  /*biker.current_km = 0;
   biker.current_meter = 0.0;
-  for (i = 0; i < 3; i++) biker.speed[i] = 50.0;
+  for (i = 0; i < 3; i++) biker.speed[i] = 50.0;*/
   kilometers = malloc(sizeof(kilometer)*info.road_total_length);
   for (i = 0, k = 0; i < info.blocks_num; i++, k = j)
     for (j = k; j < k + info.blocks[i].length; j++) {
@@ -111,7 +112,7 @@ RACEload (const char *inputfile) {
 
   args.road_total_length = info.road_total_length;
   args.road_capacity = info.road_capacity;
-  args.biker = &biker;
+  args.biker = bikers;
 
   return 0;
 }
@@ -200,6 +201,7 @@ RACErun () {
 void
 RACEcleanup () {
   puts("Bye-buh");
+  free(bikers);
   free(kilometers);
 }
 
