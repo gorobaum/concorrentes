@@ -77,13 +77,15 @@ BIKERcallback (void *arg) {
   
   puts("Biker runs!");
   while (biker->current_km < (int)road->total_length) {
-    biker->current_meter += 
-      biker->speed[road->kilometers[biker->current_km].type];
     if (biker->current_meter >= 1000.0 ) {
       /*printf("Advanced: %lu\n", biker->current_km);*/
       advance_kilometer (biker, road);
       biker->current_meter -= 1000.0;
       /*printf("Biker #%u advanced to km %u.\n", biker->id, biker->current_km);*/
+    }
+    else {
+      biker->current_meter += 
+        biker->speed[road->kilometers[biker->current_km].type];
     }
     nanosleep(&delay, NULL);
   }

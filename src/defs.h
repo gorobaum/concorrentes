@@ -29,6 +29,7 @@ typedef struct {
   size_t      bikers_num;
   roadblock_t type;
   size_t      checkpoint_id;
+  int      *bikers_id;
 } kilometer;
 
 typedef struct {
@@ -45,7 +46,7 @@ typedef struct {
 
 typedef struct {
   pthread_mutex_t  mutex;
-  size_t           bikers_id[3];
+  size_t           bikers_id[6];
   double           relative_dist;
 } checkpoint_t;
 
