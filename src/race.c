@@ -4,6 +4,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include "defs.h"
+#include "biker.h"
 #include "race.h"
 
 static const char SPEEDTYPE_NAMES[2] = { 'U', 'A' };
@@ -64,32 +65,6 @@ load_simulation_info (const char* filename) {
   input = NULL;
 
   return 0;
-}
-
-static void
-BIKERinit_speed (double speed[3], biker_speed_t speed_type) {
-  if (speed_type == UNIFORMSPEED)
-    speed[0] = speed[1] = speed[2] = KMH_TO_MMIN(50.0);
-  else if (speed_type == RANDOMSPEED) {
-    speed[0] = KMH_TO_MMIN(20 + 1.0*rand()/RAND_MAX*60.0);
-    speed[1] = KMH_TO_MMIN(20 + 1.0*rand()/RAND_MAX*60.0);
-    speed[2] = KMH_TO_MMIN(20 + 1.0*rand()/RAND_MAX*60.0);
-  }
-  else puts("**WARNING**: Unknown speed type detected.");
-}
-
-static biker_t*
-BIKERmake_all (size_t bikers_num, biker_speed_t speed_type) {
-  size_t  i;
-  biker_t *bikers = NULL;
-  bikers = (biker_t*)malloc(sizeof(*bikers)*bikers_num);
-  for (i = 0; i < bikers_num; i++) {
-    bikers[i].id = i;
-    bikers[i].current_km = -1;
-    bikers[i].current_meter = 1000;
-    BIKERinit_speed(bikers[i].speed, speed_type);
-  }
-  return bikers;
 }
 
 int

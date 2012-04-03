@@ -5,12 +5,17 @@
 #define BUFFER_SIZE     256
 #define MAX_BLOCKS      256
 
-#define KMH_TO_MMIN(v)  ((v)*60.0/1000.0)
-
 typedef enum {
   UNIFORMSPEED,
   RANDOMSPEED
 } biker_speed_t;
+
+typedef struct {
+  unsigned  id;
+  int       current_km;
+  double    current_meter,
+            speed[3]; /* METERS/MIN */
+} biker_t;
 
 typedef enum {
   PLANE,
@@ -24,22 +29,15 @@ typedef struct {
 } kilometer;
 
 typedef struct {
-  unsigned  id;
-  int       current_km;
-  double    current_meter,
-            speed[3]; /* METERS/MIN */
-} biker_t;
+  roadblock_t type;
+  size_t      length;
+} roadblock_info;
 
 typedef struct {
   biker_t *biker;
   size_t  road_total_length,
           road_capacity;
 } arg_t;
-
-typedef struct {
-  roadblock_t type;
-  size_t      length;
-} roadblock_info;
 
 typedef struct {
   size_t          bikers_num,
