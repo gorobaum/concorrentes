@@ -44,6 +44,10 @@ advance_kilometer (biker_t *biker, road_t *road) {
   while(1) {
     /* LOCK */
     pthread_mutex_lock(&road->mutex);
+    if (biker->current_km < 0) {
+      road->kilometers[++biker->current_km].bikers_num++;
+      break;
+    }
     if (biker->current_km >= (int)road->total_length-1) {
       road->kilometers[biker->current_km].bikers_num--;
       biker->current_km++;

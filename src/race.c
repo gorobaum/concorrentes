@@ -160,6 +160,12 @@ RACErun () {
     puts("error creating mutex.");
     return -1;
   }
+
+  for (i = 0; i < info.blocks_num; i++)
+    if (pthread_mutex_init(&road.checkpoints[i].mutex, NULL)) {
+      puts("error creating checkpoints mutex.");
+      return -1;
+    }
   
   for (i = 0; i < info.bikers_num; i++)
     if (pthread_create(&biker_thread[i], NULL, BIKERcallback, (void*)&args[i]))
@@ -184,6 +190,7 @@ RACEcleanup () {
   puts("Bye-buh");
   free(bikers);
   free(road.kilometers);
+  free(road.checkpoints);
   free(args);
   free(rank.ids);
 }
