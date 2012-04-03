@@ -28,7 +28,7 @@ typedef enum {
 } roadblock_t;
 
 typedef struct {
-  size_t      bikers_num;
+  /*size_t      bikers_num;*/
   roadblock_t type;
   int         checkpoint_id;
   biker_id    *bikers_id;

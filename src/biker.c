@@ -39,23 +39,52 @@ BIKERmake_all (size_t bikers_num, biker_speed_t speed_type) {
 
 /* Funções da simulação dos bikers. */
 
+/* REQUIRES LOCK */
+static void 
+remove_from_km (biker_t *biker, kilometer *km, size_t cap) {
+  int i;
+  for (i = 0; i < cap; i++)
+    if (km->bikers_id[i] == biker->id) {
+      km->bikers_id[i] = -1;
+      return;
+    }
+}
+
+/* REQUIRES LOCK */
 static int
+add_to_km (biker_t *biker, kilometer *km, size_t cap) {
+  int i;
+  for (i = 0; i < cap; i++)
+    if (km->bikers_id[i] == -1) {
+      km->bikers_id[i] = biker->id;
+      return 1;
+    }
+  return 0;
+}
+
+static void
 advance_kilometer (biker_t *biker, road_t *road) {
   while(1) {
     /* LOCK */
     pthread_mutex_lock(&road->mutex);
     if (biker->current_km < 0) {
-      road->kilometers[++biker->current_km].bikers_num++;
-      break;
+      /*road->kilometers[++biker->current_km].bikers_num++;*/
+      if (add_to_km(biker, &road->kilometers[biker->current_km+1], road->capacity)) {
+        biker->current_km++;
+        break;
+      }
     }
     if (biker->current_km >= (int)road->total_length-1) {
-      road->kilometers[biker->current_km].bikers_num--;
+      /*road->kilometers[biker->current_km].bikers_num--;*/
+      remove_from_km(biker, &road->kilometers[biker->current_km], road->capacity);
       biker->current_km++;
       break;
     }
-    else if (road->kilometers[biker->current_km+1].bikers_num < road->capacity) {
-      road->kilometers[biker->current_km].bikers_num--;
-      road->kilometers[++biker->current_km].bikers_num++;
+    else if (add_to_km(biker, &road->kilometers[biker->current_km+1], road->capacity)) {
+      /*road->kilometers[biker->current_km].bikers_num--;
+      road->kilometers[++biker->current_km].bikers_num++;*/
+      remove_from_km(biker, &road->kilometers[biker->current_km], road->capacity);
+      biker->current_km++;
       break;
     }
     /* UNLOCK */
@@ -65,7 +94,6 @@ advance_kilometer (biker_t *biker, road_t *road) {
   }
   /* UNLOCK */
   pthread_mutex_unlock(&road->mutex);
-  return 1;
 }
 
 static void

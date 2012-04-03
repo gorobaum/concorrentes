@@ -90,7 +90,7 @@ RACEcreate_checkpoint() {
 static void
 init_km(kilometer *km, roadblock_t type) {
   int i;
-  km->bikers_num = 0;
+  /*km->bikers_num = 0;*/
   km->type = type;
   km->checkpoint_id = -1;
   km->bikers_id = malloc(sizeof(*km->bikers_id)*info.road_capacity);
