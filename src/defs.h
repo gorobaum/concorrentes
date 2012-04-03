@@ -2,6 +2,8 @@
 #ifndef EP1_DEFS_H_
 #define EP1_DEFS_H_
 
+#include <pthread.h>
+
 #define BUFFER_SIZE     256
 #define MAX_BLOCKS      256
 
@@ -34,9 +36,15 @@ typedef struct {
 } roadblock_info;
 
 typedef struct {
+  kilometer         *kilometers;
+  pthread_mutex_t   mutex;
+  size_t            total_length,
+					capacity;
+} road_t;
+
+typedef struct {
   biker_t *biker;
-  size_t  road_total_length,
-          road_capacity;
+  road_t  *road;
 } arg_t;
 
 typedef struct {

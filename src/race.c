@@ -11,10 +11,11 @@ static const char SPEEDTYPE_NAMES[2] = { 'U', 'A' };
 static const char ROADBLOCKTYPE_NAMES[3] = { 'P', 'S', 'D'};
 
 static simulation_info  info;
-static arg_t            args;
+static arg_t            *args;
 static kilometer        *kilometers;
 static biker_t          *bikers;
 static pthread_mutex_t  road_mutex;
+static road_t           road;
 
 /*  0 -> success
  * -1 -> failure */
@@ -80,11 +81,12 @@ RACEload (const char *inputfile) {
   /*biker.current_km = 0;
   biker.current_meter = 0.0;
   for (i = 0; i < 3; i++) biker.speed[i] = 50.0;*/
-  kilometers = malloc(sizeof(kilometer)*info.road_total_length);
+  road.kilometers = malloc(sizeof(kilometer)*info.road_total_length);
+  args = malloc(sizeof(arg_t)*info.bikers_num);
   for (i = 0, k = 0; i < info.blocks_num; i++, k = j)
     for (j = k; j < k + info.blocks[i].length; j++) {
-      kilometers[j].bikers_num = 0;
-      kilometers[j].type = info.blocks[i].type;
+      road.kilometers[j].bikers_num = 0;
+      road.kilometers[j].type = info.blocks[i].type;
       /*printf("KM[%lu] = { %lu, %c }\n",
         j,
         kilometers[j].bikers_num,
@@ -92,9 +94,12 @@ RACEload (const char *inputfile) {
       );*/
     }
 
-  args.road_total_length = info.road_total_length;
-  args.road_capacity = info.road_capacity;
-  args.biker = bikers;
+  road.total_length = info.road_total_length;
+  road.capacity = info.road_capacity;
+  for (i = 0; i < info.bikers_num; i++) {
+    args[i].biker = &bikers[i];
+	args[i].road = &road;
+  }
 
   return 0;
 }
@@ -137,16 +142,16 @@ advance_kilometer (biker_t *biker, size_t road_capacity) {
 void*
 biker_callback (void *arg) {
   arg_t   *args = (arg_t*)arg;
-  biker_t *biker;
+  road_t  *road = args->road;
+  biker_t *biker = args->biker;
   
-  biker = args->biker;
   puts("Biker runs!");
-  while (biker->current_km < args->road_total_length) {
+  while (biker->current_km < road->total_length) {
     biker->current_meter += 
-      biker->speed[kilometers[biker->current_km].type];
+      biker->speed[road->kilometers[biker->current_km].type];
     if (biker->current_meter >= 1000.0 ) {
       /*printf("Advanced: %lu\n", biker->current_km);*/
-      advance_kilometer (biker, args->road_total_length);
+      advance_kilometer (biker, road->total_length);
       biker->current_meter = 0.0;
     }
   }
@@ -163,7 +168,7 @@ RACErun () {
     return -1;
   }
 
-  if (pthread_create(&biker_thread, NULL, biker_callback, (void*)&args)) {
+  if (pthread_create(&biker_thread, NULL, biker_callback, (void*)&args[0])) {
     puts("error creating thread.");
     return -1;
   }
