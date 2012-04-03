@@ -68,7 +68,14 @@ load_simulation_info (const char* filename) {
 
 static void
 BIKERinit_speed (double speed[3], biker_speed_t speed_type) {
-  speed[0] = speed[1] = speed[2] = 50.0;
+  if (speed_type == UNIFORMSPEED)
+    speed[0] = speed[1] = speed[2] = KMH_TO_MMIN(50.0);
+  else if (speed_type == RANDOMSPEED) {
+    speed[0] = KMH_TO_MMIN(20 + 1.0*rand()/RAND_MAX*60.0);
+    speed[1] = KMH_TO_MMIN(20 + 1.0*rand()/RAND_MAX*60.0);
+    speed[2] = KMH_TO_MMIN(20 + 1.0*rand()/RAND_MAX*60.0);
+  }
+  else puts("**WARNING**: Unknown speed type detected.");
 }
 
 static biker_t*

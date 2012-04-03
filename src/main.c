@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "race.h"
 
@@ -11,6 +12,8 @@ main (int argc, char **argv) {
     puts("-.-");
     return EXIT_FAILURE;
   }
+
+  srand(time(NULL));
   
   if (RACEload(argv[1]))
     return EXIT_FAILURE;

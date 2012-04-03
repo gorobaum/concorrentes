@@ -2,8 +2,10 @@
 #ifndef EP1_DEFS_H_
 #define EP1_DEFS_H_
 
-#define BUFFER_SIZE 256
-#define MAX_BLOCKS  256
+#define BUFFER_SIZE     256
+#define MAX_BLOCKS      256
+
+#define KMH_TO_MMIN(v)  ((v)*60.0/1000.0)
 
 typedef enum {
   UNIFORMSPEED,
