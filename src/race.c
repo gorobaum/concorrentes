@@ -13,7 +13,6 @@ static const char ROADBLOCKTYPE_NAMES[3] = { 'P', 'S', 'D'};
 static simulation_info  info;
 static arg_t            *args;
 static biker_t          *bikers;
-static pthread_mutex_t  road_mutex;
 static road_t           road;
 
 /*  0 -> success
@@ -165,7 +164,7 @@ RACErun () {
 
   biker_thread = malloc(sizeof(pthread_t)*info.bikers_num);
 
-  if (pthread_mutex_init(&road_mutex, NULL)) {
+  if (pthread_mutex_init(&road.mutex, NULL)) {
     puts("error creating mutex.");
     return -1;
   }
@@ -181,7 +180,7 @@ RACErun () {
       printf("***WARNING***: Biker #%lu's companions miss him.\n", i);
 
   free(biker_thread);
-  pthread_mutex_destroy(&road_mutex);
+  pthread_mutex_destroy(&road.mutex);
 
   return 0;
 }
