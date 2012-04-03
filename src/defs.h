@@ -28,6 +28,7 @@ typedef enum {
 typedef struct {
   size_t      bikers_num;
   roadblock_t type;
+  size_t      checkpoint_id;
 } kilometer;
 
 typedef struct {
@@ -39,8 +40,14 @@ typedef struct {
   kilometer         *kilometers;
   pthread_mutex_t   mutex;
   size_t            total_length,
-					capacity;
+					          capacity;
 } road_t;
+
+typedef struct {
+  pthread_mutex_t  mutex;
+  size_t           bikers_id[3];
+  double           relative_dist;
+} checkpoint_t;
 
 typedef struct {
   int             *ids;

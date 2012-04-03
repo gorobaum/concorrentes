@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include "biker.h"
 
-static struct timespec delay = { 0, 1000000 },
+static struct timespec delay = { 0, 500000 },
                        rem;
 
 static void
@@ -14,9 +14,9 @@ init_speed (double speed[3], biker_speed_t speed_type) {
   if (speed_type == UNIFORMSPEED)
     speed[0] = speed[1] = speed[2] = KMH_TO_MMIN(50.0);
   else if (speed_type == RANDOMSPEED) {
-    speed[0] = KMH_TO_MMIN(20 + 1.0*rand()/RAND_MAX*60.0);
-    speed[1] = KMH_TO_MMIN(20 + 1.0*rand()/RAND_MAX*60.0);
-    speed[2] = KMH_TO_MMIN(20 + 1.0*rand()/RAND_MAX*60.0);
+    speed[0] = KMH_TO_MMIN(20 + 1.0*rand()/RAND_MAX*60.0)/2;
+    speed[1] = KMH_TO_MMIN(20 + 1.0*rand()/RAND_MAX*60.0)/2;
+    speed[2] = KMH_TO_MMIN(20 + 1.0*rand()/RAND_MAX*60.0)/2;
   }
   else puts("**WARNING**: Unknown speed type detected.");
 }
