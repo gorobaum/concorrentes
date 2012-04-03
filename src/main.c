@@ -18,7 +18,7 @@ main (int argc, char **argv) {
   if (RACEload(argv[1]))
     return EXIT_FAILURE;
   
-  RACEdisplay_info();
+  /*RACEdisplay_info();*/
 
   if (RACErun())
     return EXIT_FAILURE;

@@ -25,7 +25,7 @@ init_speed (double speed[3], biker_speed_t speed_type) {
 
 biker_t*
 BIKERmake_all (size_t bikers_num, biker_speed_t speed_type) {
-  size_t  i;
+  int  i;
   biker_t *bikers = NULL;
   bikers = (biker_t*)malloc(sizeof(*bikers)*bikers_num);
   for (i = 0; i < bikers_num; i++) {
@@ -81,8 +81,17 @@ checkpoint (biker_t *biker, road_t *road) {
     if (biker->current_meter >= road->checkpoints[check_id].relative_dist) {
       for (i = 0; i < 6; i++) {
         if (road->checkpoints[check_id].bikers_id[i] == biker->id) break;
-        if (road->checkpoints[check_id].bikers_id[i] < 0) 
+        if (road->checkpoints[check_id].bikers_id[i] < 0)  {
+          /*printf("Biker #%d has crossed cp #%d\n", biker->id, check_id);*/
           road->checkpoints[check_id].bikers_id[i] = biker->id;
+          break;
+        }
+      }
+      if (i == 5 && !road->checkpoints[check_id].complete) {
+        printf("Checkpoint #%d:\n", check_id);
+        for (i = 0; i < 6; i++)
+          printf("\t[%d] biker #%d\n", i, road->checkpoints[check_id].bikers_id[i]);
+        road->checkpoints[check_id].complete = 1;
       }
     pthread_mutex_unlock(&road->checkpoints[check_id].mutex);
     }
@@ -96,7 +105,7 @@ BIKERcallback (void *arg) {
   biker_t *biker = args->biker;
   rank_t  *rank = args->rank;
   
-  puts("Biker runs!");
+  /*puts("Biker runs!");*/
   while (biker->current_km < (int)road->total_length) {
     if (biker->current_meter >= 1000.0 ) {
       /*printf("Advanced: %lu\n", biker->current_km);*/
@@ -111,9 +120,8 @@ BIKERcallback (void *arg) {
     }
     nanosleep(&delay, NULL);
   }
-  printf("Biker #%u finished.\n", biker->id);
   finish_race(biker, rank);
-  printf("Biker #%u finished.\n", biker->id);
+  /*printf("Biker #%u finished.\n", biker->id);*/
   return NULL;
 }
 

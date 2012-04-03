@@ -40,9 +40,10 @@ typedef struct {
 } roadblock_info;
 
 typedef struct {
-  pthread_mutex_t  mutex;
-  biker_id         bikers_id[6];
-  double           relative_dist;
+  pthread_mutex_t   mutex;
+  biker_id          bikers_id[6];
+  double            relative_dist;
+  char              complete;
 } checkpoint_t;
 
 typedef struct {

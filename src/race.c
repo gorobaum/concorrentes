@@ -69,19 +69,19 @@ load_simulation_info (const char* filename) {
 
 void
 RACEcreate_checkpoint() {
-  int i, j;
+  int i, j, check_num;
   size_t actual_km = 0;
 
   road.checkpoints = malloc(sizeof(*road.checkpoints)*info.blocks_num);
 
-  for (i = 0, j = 0; i < info.blocks_num; i++) {
-    if (info.blocks[i].type == DOWN) {
-      road.kilometers[actual_km].checkpoint_id = j++;
-      road.checkpoints[j].relative_dist = 0.0;
-    }
-    else if (info.blocks[i].type == PLANE) {
-      road.kilometers[actual_km].checkpoint_id = j++;
-      road.checkpoints[j].relative_dist = (info.blocks[i].length%2)*500.0;
+  for (i = 0, check_num = 0; i < info.blocks_num; i++) {
+    if (info.blocks[i].type != UP) {
+      road.kilometers[actual_km].checkpoint_id = check_num;
+      road.checkpoints[check_num].complete = 0;
+      for (j = 0; j < 6; j++)
+        road.checkpoints[check_num].bikers_id[j] = -1;
+      road.checkpoints[check_num++].relative_dist =
+        (info.blocks[i].type==PLANE)*(info.blocks[i].length%2)*500.0;
     }
     actual_km += info.blocks[i].length; 
   }
@@ -164,8 +164,6 @@ RACErun () {
   for (i = 0; i < info.bikers_num; i++)
     if (pthread_create(&biker_thread[i], NULL, BIKERcallback, (void*)&args[i]))
       printf("***WARNING***: Biker #%lu was not able to enter the race.\n", i);
-
-  puts("Waiting lonely biker.");
 
   for (i = 0; i < info.bikers_num; i++)
     if (pthread_join(biker_thread[i], NULL))
