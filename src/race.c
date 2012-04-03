@@ -172,21 +172,15 @@ RACErun () {
     return -1;
   }
   
-  for (i = 0; i < bikers_num; i++) { 
-    if (pthread_create(&biker_thread[i], NULL, biker_callback, (void*)&args[i])) {
-      puts("error creating thread.");
-      return -1;
-    }
-  }
+  for (i = 0; i < bikers_num; i++)
+    if (pthread_create(&biker_thread[i], NULL, biker_callback, (void*)&args[i]))
+      printf("***WARNING***: Biker #%lu was not able to enter the race.\n", i);
 
   puts("Waiting lonely biker.");
 
-  for (i = 0; i < bikers_num; i++) {
-    if (pthread_join(biker_thread[i], NULL)) {
-      printf("error joining thread.");
-      return -1;
-    }
-  }
+  for (i = 0; i < bikers_num; i++)
+    if (pthread_join(biker_thread[i], NULL))
+      printf("***WARNING***: Biker #%lu's companions miss him.\n");
 
   free(biker_thread);
   pthread_mutex_destroy(&road_mutex);
