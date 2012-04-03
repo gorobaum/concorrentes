@@ -9,6 +9,8 @@
 static struct timespec delay = { 0, 500000 },
                        rem;
 
+/* Funções de Inicialização */
+
 static void
 init_speed (double speed[3], biker_speed_t speed_type) {
   if (speed_type == UNIFORMSPEED)
@@ -35,6 +37,8 @@ BIKERmake_all (size_t bikers_num, biker_speed_t speed_type) {
   }
   return bikers;
 }
+
+/* Funções da simulação dos bikers. */
 
 static int
 advance_kilometer (biker_t *biker, road_t *road) {
@@ -68,6 +72,23 @@ finish_race (biker_t *biker, rank_t *rank) {
   pthread_mutex_unlock(&rank->mutex);
 }
 
+void
+checkpoint (biker_t *biker, road_t *road) {
+  int check_id, i;
+  check_id = road->kilometers[biker->current_km].checkpoint_id;
+  if (check_id >= 0) {
+    pthread_mutex_lock(&road->checkpoints[check_id].mutex);
+    if (biker->current_meter >= road->checkpoints[check_id].relative_dist) {
+      for (i = 0; i < 6; i++) {
+        if (road->checkpoints[check_id].bikers_id[i] == biker->id) break;
+        if (road->checkpoints[check_id].bikers_id[i] < 0) 
+          road->checkpoints[check_id].bikers_id[i] = biker->id;
+      }
+    pthread_mutex_unlock(&road->checkpoints[check_id].mutex);
+    }
+  }
+}
+
 void*
 BIKERcallback (void *arg) {
   arg_t   *args = (arg_t*)arg;
@@ -86,6 +107,7 @@ BIKERcallback (void *arg) {
     else {
       biker->current_meter += 
         biker->speed[road->kilometers[biker->current_km].type];
+      checkpoint(biker, road);
     }
     nanosleep(&delay, NULL);
   }

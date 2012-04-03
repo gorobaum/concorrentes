@@ -67,6 +67,26 @@ load_simulation_info (const char* filename) {
   return 0;
 }
 
+void
+RACEcreate_checkpoint() {
+  int i, j;
+  size_t actual_km = 0;
+
+  road.checkpoints = malloc(sizeof(*road.checkpoints)*info.blocks_num);
+
+  for (i = 0, j = 0; i < info.blocks_num; i++) {
+    if (info.blocks[i].type == DOWN) {
+      road.kilometers[actual_km].checkpoint_id = j++;
+      road.checkpoints[j].relative_dist = 0.0;
+    }
+    else if (info.blocks[i].type == PLANE) {
+      road.kilometers[actual_km].checkpoint_id = j++;
+      road.checkpoints[j].relative_dist = (info.blocks[i].length%2)*500.0;
+    }
+    actual_km += info.blocks[i].length; 
+  }
+}
+
 int
 RACEload (const char *inputfile) {
   size_t          i, j, k;
@@ -88,18 +108,21 @@ RACEload (const char *inputfile) {
     for (j = k; j < k + info.blocks[i].length; j++) {
       road.kilometers[j].bikers_num = 0;
       road.kilometers[j].type = info.blocks[i].type;
+      road.kilometers[j].checkpoint_id = -1;
       /*printf("KM[%lu] = { %lu, %c }\n",
         j,
         kilometers[j].bikers_num,
         ROADBLOCKTYPE_NAMES[kilometers[j].type]
       );*/
     }
+  
+  RACEcreate_checkpoint();
 
   road.total_length = info.road_total_length;
   road.capacity = info.road_capacity;
   for (i = 0; i < info.bikers_num; i++) {
     args[i].biker = &bikers[i];
-	args[i].road = &road;
+	  args[i].road = &road;
     args[i].rank = &rank;
   }
 

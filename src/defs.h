@@ -7,13 +7,15 @@
 #define BUFFER_SIZE     256
 #define MAX_BLOCKS      256
 
+typedef long biker_id;
+
 typedef enum {
   UNIFORMSPEED,
   RANDOMSPEED
 } biker_speed_t;
 
 typedef struct {
-  unsigned  id;
+  biker_id  id;
   int       current_km;
   double    current_meter,
             speed[3]; /* METERS/MIN */
@@ -28,8 +30,8 @@ typedef enum {
 typedef struct {
   size_t      bikers_num;
   roadblock_t type;
-  size_t      checkpoint_id;
-  int      *bikers_id;
+  int         checkpoint_id;
+  biker_id    *bikers_id;
 } kilometer;
 
 typedef struct {
@@ -38,17 +40,18 @@ typedef struct {
 } roadblock_info;
 
 typedef struct {
+  pthread_mutex_t  mutex;
+  biker_id         bikers_id[6];
+  double           relative_dist;
+} checkpoint_t;
+
+typedef struct {
   kilometer         *kilometers;
   pthread_mutex_t   mutex;
   size_t            total_length,
 					          capacity;
+  checkpoint_t      *checkpoints;
 } road_t;
-
-typedef struct {
-  pthread_mutex_t  mutex;
-  size_t           bikers_id[6];
-  double           relative_dist;
-} checkpoint_t;
 
 typedef struct {
   int             *ids;
