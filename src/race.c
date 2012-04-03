@@ -87,6 +87,14 @@ RACEcreate_checkpoint() {
   }
 }
 
+static void
+init_km(kilometer *km, roadblock_t type) {
+  km->bikers_num = 0;
+  km->type = type;
+  km->checkpoint_id = -1;
+  km->bikers_id = malloc(sizeof(*km->bikers_id)*info.road_capacity);
+}
+
 int
 RACEload (const char *inputfile) {
   size_t          i, j, k;
@@ -106,9 +114,7 @@ RACEload (const char *inputfile) {
   rank.last = 0;
   for (i = 0, k = 0; i < info.blocks_num; i++, k = j)
     for (j = k; j < k + info.blocks[i].length; j++) {
-      road.kilometers[j].bikers_num = 0;
-      road.kilometers[j].type = info.blocks[i].type;
-      road.kilometers[j].checkpoint_id = -1;
+      init_km(&road.kilometers[j], info.blocks[i].type);
       /*printf("KM[%lu] = { %lu, %c }\n",
         j,
         kilometers[j].bikers_num,
