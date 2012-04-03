@@ -15,7 +15,6 @@ static arg_t            *args;
 static biker_t          *bikers;
 static pthread_mutex_t  road_mutex;
 static road_t           road;
-static size_t           bikers_num;
 
 /*  0 -> success
  * -1 -> failure */
@@ -81,7 +80,6 @@ RACEload (const char *inputfile) {
   /*biker.current_km = 0;
   biker.current_meter = 0.0;
   for (i = 0; i < 3; i++) biker.speed[i] = 50.0;*/
-  bikers_num = info.bikers_num;
   road.kilometers = malloc(sizeof(kilometer)*info.road_total_length);
   args = malloc(sizeof(arg_t)*info.bikers_num);
   for (i = 0, k = 0; i < info.blocks_num; i++, k = j)
@@ -165,22 +163,22 @@ RACErun () {
   size_t i;
   pthread_t *biker_thread;
 
-  biker_thread = malloc(sizeof(pthread_t)*bikers_num);
+  biker_thread = malloc(sizeof(pthread_t)*info.bikers_num);
 
   if (pthread_mutex_init(&road_mutex, NULL)) {
     puts("error creating mutex.");
     return -1;
   }
   
-  for (i = 0; i < bikers_num; i++)
+  for (i = 0; i < info.bikers_num; i++)
     if (pthread_create(&biker_thread[i], NULL, biker_callback, (void*)&args[i]))
       printf("***WARNING***: Biker #%lu was not able to enter the race.\n", i);
 
   puts("Waiting lonely biker.");
 
-  for (i = 0; i < bikers_num; i++)
+  for (i = 0; i < info.bikers_num; i++)
     if (pthread_join(biker_thread[i], NULL))
-      printf("***WARNING***: Biker #%lu's companions miss him.\n");
+      printf("***WARNING***: Biker #%lu's companions miss him.\n", i);
 
   free(biker_thread);
   pthread_mutex_destroy(&road_mutex);
