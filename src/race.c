@@ -152,6 +152,9 @@ RACErun () {
   pthread_mutex_destroy(&road.mutex);
   pthread_mutex_destroy(&rank.mutex);
 
+  for (i = 0; i < info.bikers_num; i++)
+    printf("[%4lu] %d\n", i+1, rank.ids[i]);
+
   return 0;
 }
 

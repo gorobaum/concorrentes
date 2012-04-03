@@ -1,7 +1,13 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/time.h>
+#include <time.h>
+#include <unistd.h>
 #include "biker.h"
+
+static struct timespec delay = { 0, 1000000 },
+                       rem;
 
 static void
 init_speed (double speed[3], biker_speed_t speed_type) {
@@ -23,8 +29,9 @@ BIKERmake_all (size_t bikers_num, biker_speed_t speed_type) {
   for (i = 0; i < bikers_num; i++) {
     bikers[i].id = i;
     bikers[i].current_km = -1;
-    bikers[i].current_meter = 1000;
+    bikers[i].current_meter = 1000.0;
     init_speed(bikers[i].speed, speed_type);
+    printf("speed #%lu: %lf\n", i, bikers[i].speed[0]);
   }
   return bikers;
 }
@@ -34,7 +41,12 @@ advance_kilometer (biker_t *biker, road_t *road) {
   while(1) {
     /* LOCK */
     pthread_mutex_lock(&road->mutex);
-    if (road->kilometers[biker->current_km+1].bikers_num < road->capacity) {
+    if (biker->current_km >= (int)road->total_length-1) {
+      road->kilometers[biker->current_km].bikers_num--;
+      biker->current_km++;
+      break;
+    }
+    else if (road->kilometers[biker->current_km+1].bikers_num < road->capacity) {
       road->kilometers[biker->current_km].bikers_num--;
       road->kilometers[++biker->current_km].bikers_num++;
       break;
@@ -64,18 +76,20 @@ BIKERcallback (void *arg) {
   rank_t  *rank = args->rank;
   
   puts("Biker runs!");
-  while (biker->current_km < road->total_length) {
+  while (biker->current_km < (int)road->total_length) {
     biker->current_meter += 
       biker->speed[road->kilometers[biker->current_km].type];
     if (biker->current_meter >= 1000.0 ) {
       /*printf("Advanced: %lu\n", biker->current_km);*/
       advance_kilometer (biker, road);
-      biker->current_meter = 0.0;
+      biker->current_meter -= 1000.0;
+      /*printf("Biker #%u advanced to km %u.\n", biker->id, biker->current_km);*/
     }
+    nanosleep(&delay, NULL);
   }
-
+  printf("Biker #%u finished.\n", biker->id);
   finish_race(biker, rank);
-
+  printf("Biker #%u finished.\n", biker->id);
   return NULL;
 }
 
