@@ -89,10 +89,13 @@ RACEcreate_checkpoint() {
 
 static void
 init_km(kilometer *km, roadblock_t type) {
+  int i;
   km->bikers_num = 0;
   km->type = type;
   km->checkpoint_id = -1;
   km->bikers_id = malloc(sizeof(*km->bikers_id)*info.road_capacity);
+  for (i = 0; i < info.road_capacity; i++)
+    km->bikers_id[i] = -1;
 }
 
 int
@@ -193,8 +196,11 @@ RACErun () {
 
 void
 RACEcleanup () {
+  int i;
   puts("Bye-buh");
   free(bikers);
+  for (i = 0; i < road.total_length; i++)
+    free(road.kilometers[i].bikers_id);
   free(road.kilometers);
   free(road.checkpoints);
   free(args);
