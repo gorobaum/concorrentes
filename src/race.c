@@ -14,6 +14,7 @@ static simulation_info  info;
 static arg_t            *args;
 static biker_t          *bikers;
 static road_t           road;
+static rank_t           rank;
 
 /*  0 -> success
  * -1 -> failure */
@@ -81,6 +82,8 @@ RACEload (const char *inputfile) {
   for (i = 0; i < 3; i++) biker.speed[i] = 50.0;*/
   road.kilometers = malloc(sizeof(kilometer)*info.road_total_length);
   args = malloc(sizeof(arg_t)*info.bikers_num);
+  rank.ids = malloc(sizeof(*rank.ids)*info.bikers_num);
+  rank.last = 0;
   for (i = 0, k = 0; i < info.blocks_num; i++, k = j)
     for (j = k; j < k + info.blocks[i].length; j++) {
       road.kilometers[j].bikers_num = 0;
@@ -97,6 +100,7 @@ RACEload (const char *inputfile) {
   for (i = 0; i < info.bikers_num; i++) {
     args[i].biker = &bikers[i];
 	args[i].road = &road;
+    args[i].rank = &rank;
   }
 
   return 0;
@@ -128,6 +132,11 @@ RACErun () {
     puts("error creating mutex.");
     return -1;
   }
+
+  if (pthread_mutex_init(&rank.mutex, NULL)) {
+    puts("error creating mutex.");
+    return -1;
+  }
   
   for (i = 0; i < info.bikers_num; i++)
     if (pthread_create(&biker_thread[i], NULL, BIKERcallback, (void*)&args[i]))
@@ -141,6 +150,7 @@ RACErun () {
 
   free(biker_thread);
   pthread_mutex_destroy(&road.mutex);
+  pthread_mutex_destroy(&rank.mutex);
 
   return 0;
 }
@@ -151,5 +161,6 @@ RACEcleanup () {
   free(bikers);
   free(road.kilometers);
   free(args);
+  free(rank.ids);
 }
 

@@ -43,8 +43,15 @@ typedef struct {
 } road_t;
 
 typedef struct {
+  int             *ids;
+  size_t          last;
+  pthread_mutex_t mutex;
+} rank_t;
+
+typedef struct {
   biker_t *biker;
   road_t  *road;
+  rank_t  *rank;
 } arg_t;
 
 typedef struct {

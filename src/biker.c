@@ -49,11 +49,19 @@ advance_kilometer (biker_t *biker, road_t *road) {
   return 1;
 }
 
+static void
+finish_race (biker_t *biker, rank_t *rank) {
+  pthread_mutex_lock(&rank->mutex);
+  rank->ids[rank->last++] = biker->id;
+  pthread_mutex_unlock(&rank->mutex);
+}
+
 void*
 BIKERcallback (void *arg) {
   arg_t   *args = (arg_t*)arg;
   road_t  *road = args->road;
   biker_t *biker = args->biker;
+  rank_t  *rank = args->rank;
   
   puts("Biker runs!");
   while (biker->current_km < road->total_length) {
@@ -65,6 +73,8 @@ BIKERcallback (void *arg) {
       biker->current_meter = 0.0;
     }
   }
+
+  finish_race(biker, rank);
 
   return NULL;
 }
