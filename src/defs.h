@@ -7,7 +7,7 @@
 #define BUFFER_SIZE     256
 #define MAX_BLOCKS      256
 
-typedef long biker_id;
+typedef int biker_id;
 
 typedef enum {
   UNIFORMSPEED,

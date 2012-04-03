@@ -28,10 +28,10 @@ load_simulation_info (const char* filename) {
   if (!input) return -1;
   /* biker num */
   fgets(buffer, BUFFER_SIZE, input);
-  sscanf(buffer, "%lu", &info.bikers_num);
+  sscanf(buffer, "%u", &info.bikers_num);
   /* road capacity */
   fgets(buffer, BUFFER_SIZE, input);
-  sscanf(buffer, "%lu", &info.road_capacity);
+  sscanf(buffer, "%u", &info.road_capacity);
   /* speed type */
   fgets(buffer, BUFFER_SIZE, input);
   switch (buffer[0]) {
@@ -41,7 +41,7 @@ load_simulation_info (const char* filename) {
   }
   /* road length */
   fgets(buffer, BUFFER_SIZE, input);
-  sscanf(buffer, "%lu", &info.road_total_length);
+  sscanf(buffer, "%u", &info.road_total_length);
   /* road blocks */
   for (i = 0, total_length = 0;
        total_length < info.road_total_length && i < MAX_BLOCKS;
@@ -56,7 +56,7 @@ load_simulation_info (const char* filename) {
     }
     /* block length */
     fgets(buffer, BUFFER_SIZE, input);
-    sscanf(buffer, "%lu", &info.blocks[i].length);
+    sscanf(buffer, "%u", &info.blocks[i].length);
   }
 
   info.blocks_num = i;
@@ -133,13 +133,13 @@ void
 RACEdisplay_info () {
   size_t i;
   printf(
-    "%lu\n%lu\n%c\n%lu\n",
+    "%u\n%u\n%c\n%u\n",
     info.bikers_num,
     info.road_capacity,
     SPEEDTYPE_NAMES[info.speed_type],
     info.road_total_length);
   for (i = 0; i < info.blocks_num; i++)
-    printf("%c\n%lu\n",
+    printf("%c\n%u\n",
       ROADBLOCKTYPE_NAMES[info.blocks[i].type],
       info.blocks[i].length);
 }
@@ -163,18 +163,18 @@ RACErun () {
   
   for (i = 0; i < info.bikers_num; i++)
     if (pthread_create(&biker_thread[i], NULL, BIKERcallback, (void*)&args[i]))
-      printf("***WARNING***: Biker #%lu was not able to enter the race.\n", i);
+      printf("**WARNING**: Biker #%u was not able to enter the race.\n", i);
 
   for (i = 0; i < info.bikers_num; i++)
     if (pthread_join(biker_thread[i], NULL))
-      printf("***WARNING***: Biker #%lu's companions miss him.\n", i);
+      printf("**WARNING**: Biker #%u's companions miss him.\n", i);
 
   free(biker_thread);
   pthread_mutex_destroy(&road.mutex);
   pthread_mutex_destroy(&rank.mutex);
 
   for (i = 0; i < info.bikers_num; i++)
-    printf("[%4lu] %d\n", i+1, rank.ids[i]);
+    printf("[%4u] %d\n", i+1, rank.ids[i]);
 
   return 0;
 }

@@ -1,12 +1,12 @@
 PROG_NAME = ep1
-FLAGS=-lpthread -D_POSIX_C_SOURCE=199309L
+FLAGS=-m32 -lpthread -D_POSIX_C_SOURCE=199309L
 
 SRC_DIR = src
 OBJ_DIR = .temp
 #OUTPUT_DIR = bin
 
 CC = gcc
-CFLAGS = -ansi -pedantic -Wall -O0 $(FLAGS)
+CFLAGS = -ansi -pedantic -Wall -O2 $(FLAGS)
 
 #OUTPUT = bin/$(PROG_NAME)
 OUTPUT = $(PROG_NAME)

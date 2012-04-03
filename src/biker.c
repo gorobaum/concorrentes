@@ -6,8 +6,7 @@
 #include <unistd.h>
 #include "biker.h"
 
-static struct timespec delay = { 0, 500000 },
-                       rem;
+static struct timespec delay = { 0, 500000 };
 
 /* Funções de Inicialização */
 
@@ -16,9 +15,9 @@ init_speed (double speed[3], biker_speed_t speed_type) {
   if (speed_type == UNIFORMSPEED)
     speed[0] = speed[1] = speed[2] = KMH_TO_MMIN(50.0);
   else if (speed_type == RANDOMSPEED) {
-    speed[0] = KMH_TO_MMIN(20 + 1.0*rand()/RAND_MAX*60.0)/2;
-    speed[1] = KMH_TO_MMIN(20 + 1.0*rand()/RAND_MAX*60.0)/2;
-    speed[2] = KMH_TO_MMIN(20 + 1.0*rand()/RAND_MAX*60.0)/2;
+    speed[0] = KMH_TO_MMIN(20 + 1.0*rand()/RAND_MAX*60.0);
+    speed[1] = KMH_TO_MMIN(20 + 1.0*rand()/RAND_MAX*60.0);
+    speed[2] = KMH_TO_MMIN(20 + 1.0*rand()/RAND_MAX*60.0);
   }
   else puts("**WARNING**: Unknown speed type detected.");
 }
@@ -33,7 +32,7 @@ BIKERmake_all (size_t bikers_num, biker_speed_t speed_type) {
     bikers[i].current_km = -1;
     bikers[i].current_meter = 1000.0;
     init_speed(bikers[i].speed, speed_type);
-    printf("speed #%lu: %lf\n", i, bikers[i].speed[0]);
+    printf("speed #%u: %f\n", i, bikers[i].speed[0]);
   }
   return bikers;
 }
@@ -115,7 +114,7 @@ BIKERcallback (void *arg) {
     }
     else {
       biker->current_meter += 
-        biker->speed[road->kilometers[biker->current_km].type];
+        biker->speed[road->kilometers[biker->current_km].type]/2.0;
       checkpoint(biker, road);
     }
     nanosleep(&delay, NULL);
