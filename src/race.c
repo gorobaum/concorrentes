@@ -12,10 +12,10 @@ static const char ROADBLOCKTYPE_NAMES[3] = { 'P', 'S', 'D'};
 
 static simulation_info  info;
 static arg_t            *args;
-static kilometer        *kilometers;
 static biker_t          *bikers;
 static pthread_mutex_t  road_mutex;
 static road_t           road;
+static size_t           bikers_num;
 
 /*  0 -> success
  * -1 -> failure */
@@ -81,6 +81,7 @@ RACEload (const char *inputfile) {
   /*biker.current_km = 0;
   biker.current_meter = 0.0;
   for (i = 0; i < 3; i++) biker.speed[i] = 50.0;*/
+  bikers_num = info.bikers_num;
   road.kilometers = malloc(sizeof(kilometer)*info.road_total_length);
   args = malloc(sizeof(arg_t)*info.bikers_num);
   for (i = 0, k = 0; i < info.blocks_num; i++, k = j)
@@ -120,22 +121,22 @@ RACEdisplay_info () {
 }
 
 int
-advance_kilometer (biker_t *biker, size_t road_capacity) {
+advance_kilometer (biker_t *biker, road_t *road) {
   while(1) {
     /* LOCK */
-    pthread_mutex_lock(&road_mutex);
-    if (kilometers[biker->current_km+1].bikers_num < road_capacity) {
-      kilometers[biker->current_km].bikers_num--;
-      kilometers[++biker->current_km].bikers_num++;
+    pthread_mutex_lock(&road->mutex);
+    if (road->kilometers[biker->current_km+1].bikers_num < road->capacity) {
+      road->kilometers[biker->current_km].bikers_num--;
+      road->kilometers[++biker->current_km].bikers_num++;
       break;
     }
     /* UNLOCK */
-    pthread_mutex_unlock(&road_mutex);
+    pthread_mutex_unlock(&road->mutex);
     /* YIELD */
     /*sched_yield();*/
   }
   /* UNLOCK */
-  pthread_mutex_unlock(&road_mutex);
+  pthread_mutex_unlock(&road->mutex);
   return 1;
 }
 
@@ -151,7 +152,7 @@ biker_callback (void *arg) {
       biker->speed[road->kilometers[biker->current_km].type];
     if (biker->current_meter >= 1000.0 ) {
       /*printf("Advanced: %lu\n", biker->current_km);*/
-      advance_kilometer (biker, road->total_length);
+      advance_kilometer (biker, road);
       biker->current_meter = 0.0;
     }
   }
@@ -161,25 +162,33 @@ biker_callback (void *arg) {
 
 int
 RACErun () {
-  pthread_t biker_thread;
+  size_t i;
+  pthread_t *biker_thread;
+
+  biker_thread = malloc(sizeof(pthread_t)*bikers_num);
 
   if (pthread_mutex_init(&road_mutex, NULL)) {
     puts("error creating mutex.");
     return -1;
   }
-
-  if (pthread_create(&biker_thread, NULL, biker_callback, (void*)&args[0])) {
-    puts("error creating thread.");
-    return -1;
+  
+  for (i = 0; i < bikers_num; i++) { 
+    if (pthread_create(&biker_thread[i], NULL, biker_callback, (void*)&args[i])) {
+      puts("error creating thread.");
+      return -1;
+    }
   }
 
   puts("Waiting lonely biker.");
 
-  if (pthread_join(biker_thread, NULL)) {
-    printf("error joining thread.");
-    return -1;
+  for (i = 0; i < bikers_num; i++) {
+    if (pthread_join(biker_thread[i], NULL)) {
+      printf("error joining thread.");
+      return -1;
+    }
   }
 
+  free(biker_thread);
   pthread_mutex_destroy(&road_mutex);
 
   return 0;
@@ -189,6 +198,7 @@ void
 RACEcleanup () {
   puts("Bye-buh");
   free(bikers);
-  free(kilometers);
+  free(road.kilometers);
+  free(args);
 }
 
