@@ -29,3 +29,43 @@ BIKERmake_all (size_t bikers_num, biker_speed_t speed_type) {
   return bikers;
 }
 
+static int
+advance_kilometer (biker_t *biker, road_t *road) {
+  while(1) {
+    /* LOCK */
+    pthread_mutex_lock(&road->mutex);
+    if (road->kilometers[biker->current_km+1].bikers_num < road->capacity) {
+      road->kilometers[biker->current_km].bikers_num--;
+      road->kilometers[++biker->current_km].bikers_num++;
+      break;
+    }
+    /* UNLOCK */
+    pthread_mutex_unlock(&road->mutex);
+    /* YIELD */
+    /*sched_yield();*/
+  }
+  /* UNLOCK */
+  pthread_mutex_unlock(&road->mutex);
+  return 1;
+}
+
+void*
+BIKERcallback (void *arg) {
+  arg_t   *args = (arg_t*)arg;
+  road_t  *road = args->road;
+  biker_t *biker = args->biker;
+  
+  puts("Biker runs!");
+  while (biker->current_km < road->total_length) {
+    biker->current_meter += 
+      biker->speed[road->kilometers[biker->current_km].type];
+    if (biker->current_meter >= 1000.0 ) {
+      /*printf("Advanced: %lu\n", biker->current_km);*/
+      advance_kilometer (biker, road);
+      biker->current_meter = 0.0;
+    }
+  }
+
+  return NULL;
+}
+

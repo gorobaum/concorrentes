@@ -9,5 +9,8 @@
 biker_t*
 BIKERmake_all (size_t bikers_num, biker_speed_t speed_type);
 
+void*
+BIKERcallback (void *arg);
+
 #endif
 
