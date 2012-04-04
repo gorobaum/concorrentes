@@ -10,9 +10,15 @@
 static const char SPEEDTYPE_NAMES[2] = { 'U', 'A' };
 static const char ROADBLOCKTYPE_NAMES[3] = { 'P', 'S', 'D'};
 
+/* This contains the basic information about the current simulation. */
 static simulation_info  info;
+/* This is an array of arg_t structures used by the biker threads. */
 static arg_t            *args;
+/* This is an array of structures representing each biker. */
 static biker_t          *bikers;
+/* This is our "estrada" array. It has as many positions as there are kilometers
+ * in the current race being simulated. At any given time, its i-th position
+ * stores the identifiers of all the bikers in the interval [i,i+1). */
 static road_t           road;
 static rank_t           rank;
 
@@ -188,8 +194,9 @@ RACErun () {
   pthread_mutex_destroy(&road.mutex);
   pthread_mutex_destroy(&rank.mutex);
 
+  puts("======= YELLOW RANKING =======");
   for (i = 0; i < info.bikers_num; i++)
-    printf("[%4u] %d\n", i+1, rank.ids[i]);
+    printf("\t[%3u] Biker #%d\n", i+1, rank.ids[i]);
 
   return 0;
 }
