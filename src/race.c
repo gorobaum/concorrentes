@@ -33,27 +33,27 @@ load_simulation_info (const char* filename) {
   input = fopen(filename, "r");
   if (!input) return -1;
   /* biker num */
-  fgets(buffer, BUFFER_SIZE, input);
+  if (!fgets(buffer, BUFFER_SIZE, input)) return -1;
   sscanf(buffer, "%u", &info.bikers_num);
   /* road capacity */
-  fgets(buffer, BUFFER_SIZE, input);
+  if (!fgets(buffer, BUFFER_SIZE, input)) return -1;
   sscanf(buffer, "%u", &info.road_capacity);
   /* speed type */
-  fgets(buffer, BUFFER_SIZE, input);
+  if (!fgets(buffer, BUFFER_SIZE, input)) return -1;
   switch (buffer[0]) {
     case 'U': info.speed_type = UNIFORMSPEED; break;
     case 'A': info.speed_type = RANDOMSPEED; break;
     default: break;
   }
   /* road length */
-  fgets(buffer, BUFFER_SIZE, input);
+  if (!fgets(buffer, BUFFER_SIZE, input)) return -1;
   sscanf(buffer, "%u", &info.road_total_length);
   /* road blocks */
   for (i = 0, total_length = 0;
        total_length < info.road_total_length && i < MAX_BLOCKS;
        total_length += info.blocks[i++].length) {
     /* block type */
-    fgets(buffer, BUFFER_SIZE, input);
+    if (!fgets(buffer, BUFFER_SIZE, input)) return -1;
     switch (buffer[0]) {
       case 'P': info.blocks[i].type = PLANE; break;
       case 'S': info.blocks[i].type = UP; break;
@@ -61,7 +61,7 @@ load_simulation_info (const char* filename) {
       default: break;
     }
     /* block length */
-    fgets(buffer, BUFFER_SIZE, input);
+    if (!fgets(buffer, BUFFER_SIZE, input)) return -1;
     sscanf(buffer, "%u", &info.blocks[i].length);
   }
 
@@ -193,6 +193,8 @@ RACErun () {
   free(biker_thread);
   pthread_mutex_destroy(&road.mutex);
   pthread_mutex_destroy(&rank.mutex);
+  for (i = 0; i < info.blocks_num; i++)
+    pthread_mutex_destroy(&road.checkpoints[i].mutex);
 
   puts("======= YELLOW RANKING =======");
   for (i = 0; i < info.bikers_num; i++)
