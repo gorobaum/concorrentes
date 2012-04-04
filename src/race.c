@@ -73,8 +73,8 @@ load_simulation_info (const char* filename) {
   return 0;
 }
 
-void
-RACEcreate_checkpoint() {
+static void
+create_checkpoints () {
   int i, j, check_num;
   size_t actual_km = 0, check_km = 0;
 
@@ -133,7 +133,7 @@ RACEload (const char *inputfile) {
       );*/
     }
   
-  RACEcreate_checkpoint();
+  create_checkpoints();
 
   road.total_length = info.road_total_length;
   road.capacity = info.road_capacity;
@@ -161,6 +161,7 @@ RACEdisplay_info () {
       info.blocks[i].length);
 }
 
+/* TODO draw criteria */
 static int
 cmp_plane_score(const void *lhs, const void *rhs) {
   return
@@ -175,7 +176,7 @@ cmp_mountain_score(const void *lhs, const void *rhs) {
 
 static void
 display_rank () {
-  int     i;
+  size_t  i;
   biker_t **scored_rank = NULL;
   puts("======= YELLOW RANKING =======");
   for (i = 0; i < info.bikers_num; i++)
