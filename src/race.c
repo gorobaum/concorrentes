@@ -161,6 +161,34 @@ RACEdisplay_info () {
       info.blocks[i].length);
 }
 
+static int
+cmp_plane_score(const void *lhs, const void *rhs) {
+  return
+    (*(const biker_t**)rhs)->score[0] - (*(const biker_t**)lhs)->score[0];
+}
+
+static void
+display_rank () {
+  int     i;
+  biker_t **scored_rank = NULL;
+  puts("======= YELLOW RANKING =======");
+  for (i = 0; i < info.bikers_num; i++)
+    printf("\t[%3u] Biker #%d\n", i+1, rank.ids[i]);
+  scored_rank = malloc(sizeof(*scored_rank)*info.bikers_num);
+  for (i = 0; i < info.bikers_num; i++)
+    scored_rank[i] = bikers+i;
+  qsort(scored_rank, info.bikers_num, sizeof(*scored_rank), cmp_plane_score);
+  puts("======= GREEN RANKING =======");
+  for (i = 0; i < info.bikers_num; i++)
+    printf(
+      "\t[%3u] Biker #%d (%upts)\n",
+      i+1,
+      scored_rank[i]->id,
+      scored_rank[i]->score[0]
+    );
+  free(scored_rank); 
+}
+
 int
 RACErun () {
   size_t i;
@@ -198,9 +226,7 @@ RACErun () {
   for (i = 0; i < info.blocks_num; i++)
     pthread_mutex_destroy(&road.checkpoints[i].mutex);
 
-  puts("======= YELLOW RANKING =======");
-  for (i = 0; i < info.bikers_num; i++)
-    printf("\t[%3u] Biker #%d\n", i+1, rank.ids[i]);
+  display_rank();
 
   return 0;
 }

@@ -28,6 +28,8 @@ typedef struct {
   size_t    score[2]; /* [0] PLANE SCORE; [1] MOUNTAIN SCORE */
 } biker_t;
 
+#define SCORE_TYPE(biker, road) ((road)->kilometers[(biker)->current_km].type != PLANE)
+
 typedef struct {
   /*size_t      bikers_num;*/
   roadblock_t type;

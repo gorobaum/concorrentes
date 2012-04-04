@@ -111,8 +111,7 @@ check_checkpoint (biker_t *biker, road_t *road) {
         if (checkpoint->bikers_id[i] < 0)  {
           /*printf("Biker #%d has crossed cp #%d\n", biker->id, check_id);*/
           checkpoint->bikers_id[i] = biker->id;
-          biker->score[road->kilometers[biker->current_km].type != PLANE] +=
-            checkpoint_score[i];
+          biker->score[SCORE_TYPE(biker, road)] += checkpoint_score[i];
           break;
         }
       }
@@ -123,7 +122,11 @@ check_checkpoint (biker_t *biker, road_t *road) {
           biker->current_km + checkpoint->relative_dist/1000.0
         );
         for (i = 0; i < 6; i++)
-          printf("\t[%d] biker #%d\n", i, checkpoint->bikers_id[i]);
+          printf(
+            "\t[%d] biker #%d (+%upts)\n",
+            i,
+            checkpoint->bikers_id[i],
+            checkpoint_score[i]);
         checkpoint->complete = 1;
       }
     }
