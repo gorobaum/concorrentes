@@ -167,13 +167,19 @@ cmp_plane_score(const void *lhs, const void *rhs) {
     (*(const biker_t**)rhs)->score[0] - (*(const biker_t**)lhs)->score[0];
 }
 
+static int
+cmp_mountain_score(const void *lhs, const void *rhs) {
+  return
+    (*(const biker_t**)rhs)->score[1] - (*(const biker_t**)lhs)->score[1];
+}
+
 static void
 display_rank () {
   int     i;
   biker_t **scored_rank = NULL;
   puts("======= YELLOW RANKING =======");
   for (i = 0; i < info.bikers_num; i++)
-    printf("\t[%3u] Biker #%d\n", i+1, rank.ids[i]);
+    printf("\t[%3u] Biker #%02d\n", i+1, rank.ids[i]);
   scored_rank = malloc(sizeof(*scored_rank)*info.bikers_num);
   for (i = 0; i < info.bikers_num; i++)
     scored_rank[i] = bikers+i;
@@ -181,10 +187,19 @@ display_rank () {
   puts("======= GREEN RANKING =======");
   for (i = 0; i < info.bikers_num; i++)
     printf(
-      "\t[%3u] Biker #%d (%upts)\n",
+      "\t[%3u] Biker #%02d (%upts)\n",
       i+1,
       scored_rank[i]->id,
       scored_rank[i]->score[0]
+    );
+  qsort(scored_rank, info.bikers_num, sizeof(*scored_rank), cmp_mountain_score);
+  puts("======= RED-DOTTED WHITE RANKING =======");
+  for (i = 0; i < info.bikers_num; i++)
+    printf(
+      "\t[%3u] Biker #%02d (%upts)\n",
+      i+1,
+      scored_rank[i]->id,
+      scored_rank[i]->score[1]
     );
   free(scored_rank); 
 }

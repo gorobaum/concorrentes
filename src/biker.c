@@ -123,8 +123,8 @@ check_checkpoint (biker_t *biker, road_t *road) {
         );
         for (i = 0; i < 6; i++)
           printf(
-            "\t[%d] biker #%d (+%upts)\n",
-            i,
+            "\t[%d] biker #%02d (+%upts)\n",
+            i+1,
             checkpoint->bikers_id[i],
             checkpoint_score[i]);
         checkpoint->complete = 1;
