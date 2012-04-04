@@ -4,8 +4,8 @@
 
 #include <pthread.h>
 
-#define BUFFER_SIZE     256
-#define MAX_BLOCKS      256
+#define BUFFER_SIZE 256u
+#define MAX_BLOCKS  256u
 
 typedef int biker_id;
 

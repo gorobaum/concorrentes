@@ -115,13 +115,13 @@ check_checkpoint (biker_t *biker, road_t *road) {
           break;
         }
       }
-      if (i == 5 && !checkpoint->complete) {
+      if (i == 2 && !checkpoint->complete) {
         printf(
           "Checkpoint #%d at %.1fkm:\n",
           check_id,
           biker->current_km + checkpoint->relative_dist/1000.0
         );
-        for (i = 0; i < 6; i++)
+        for (i = 0; i < 3; i++)
           printf(
             "\t[%d] biker #%02d (+%upts)\n",
             i+1,
