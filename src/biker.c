@@ -32,6 +32,7 @@ BIKERmake_all (size_t bikers_num, biker_speed_t speed_type) {
     bikers[i].current_km = -1;
     bikers[i].current_meter = 1000.0;
     init_speed(bikers[i].speed, speed_type);
+    bikers[i].plane_score = bikers[i].mountain_score = 0;
     printf("speed #%u: %f\n", i, bikers[i].speed[0]);
   }
   return bikers;
@@ -96,37 +97,39 @@ advance_kilometer (biker_t *biker, road_t *road) {
   pthread_mutex_unlock(&road->mutex);
 }
 
+void
+checkpoint (biker_t *biker, road_t *road) {
+  int           check_id, i;
+  checkpoint_t  *checkpoint;
+  check_id = road->kilometers[biker->current_km].checkpoint_id;
+  if (check_id >= 0) {
+    checkpoint = &road->checkpoints[check_id];
+    pthread_mutex_lock(&checkpoint->mutex);
+    if (biker->current_meter >= checkpoint->relative_dist) {
+      for (i = 0; i < 6; i++) {
+        if (checkpoint->bikers_id[i] == biker->id) break;
+        if (checkpoint->bikers_id[i] < 0)  {
+          /*printf("Biker #%d has crossed cp #%d\n", biker->id, check_id);*/
+          checkpoint->bikers_id[i] = biker->id;
+          break;
+        }
+      }
+      if (i == 5 && !checkpoint->complete) {
+        printf("Checkpoint #%d:\n", check_id);
+        for (i = 0; i < 6; i++)
+          printf("\t[%d] biker #%d\n", i, checkpoint->bikers_id[i]);
+        checkpoint->complete = 1;
+      }
+    }
+    pthread_mutex_unlock(&checkpoint->mutex);
+  }
+}
+
 static void
 finish_race (biker_t *biker, rank_t *rank) {
   pthread_mutex_lock(&rank->mutex);
   rank->ids[rank->last++] = biker->id;
   pthread_mutex_unlock(&rank->mutex);
-}
-
-void
-checkpoint (biker_t *biker, road_t *road) {
-  int check_id, i;
-  check_id = road->kilometers[biker->current_km].checkpoint_id;
-  if (check_id >= 0) {
-    pthread_mutex_lock(&road->checkpoints[check_id].mutex);
-    if (biker->current_meter >= road->checkpoints[check_id].relative_dist) {
-      for (i = 0; i < 6; i++) {
-        if (road->checkpoints[check_id].bikers_id[i] == biker->id) break;
-        if (road->checkpoints[check_id].bikers_id[i] < 0)  {
-          /*printf("Biker #%d has crossed cp #%d\n", biker->id, check_id);*/
-          road->checkpoints[check_id].bikers_id[i] = biker->id;
-          break;
-        }
-      }
-      if (i == 5 && !road->checkpoints[check_id].complete) {
-        printf("Checkpoint #%d:\n", check_id);
-        for (i = 0; i < 6; i++)
-          printf("\t[%d] biker #%d\n", i, road->checkpoints[check_id].bikers_id[i]);
-        road->checkpoints[check_id].complete = 1;
-      }
-    pthread_mutex_unlock(&road->checkpoints[check_id].mutex);
-    }
-  }
 }
 
 void*

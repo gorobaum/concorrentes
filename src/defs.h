@@ -19,6 +19,8 @@ typedef struct {
   int       current_km;
   double    current_meter,
             speed[3]; /* METERS/MIN */
+  size_t    plane_score,
+            mountain_score;
 } biker_t;
 
 typedef enum {
