@@ -76,13 +76,15 @@ load_simulation_info (const char* filename) {
 void
 RACEcreate_checkpoint() {
   int i, j, check_num;
-  size_t actual_km = 0;
+  size_t actual_km = 0, check_km = 0;
 
   road.checkpoints = malloc(sizeof(*road.checkpoints)*info.blocks_num);
 
   for (i = 0, check_num = 0; i < info.blocks_num; i++) {
     if (info.blocks[i].type != UP) {
-      road.kilometers[actual_km].checkpoint_id = check_num;
+      check_km =
+        actual_km + (info.blocks[i].type==PLANE)*(info.blocks[i].length/2);
+      road.kilometers[check_km].checkpoint_id = check_num;
       road.checkpoints[check_num].complete = 0;
       for (j = 0; j < 6; j++)
         road.checkpoints[check_num].bikers_id[j] = -1;

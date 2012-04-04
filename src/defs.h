@@ -14,20 +14,19 @@ typedef enum {
   RANDOMSPEED
 } biker_speed_t;
 
-typedef struct {
-  biker_id  id;
-  int       current_km;
-  double    current_meter,
-            speed[3]; /* METERS/MIN */
-  size_t    plane_score,
-            mountain_score;
-} biker_t;
-
 typedef enum {
   PLANE,
   UP,
   DOWN
 } roadblock_t;
+
+typedef struct {
+  biker_id  id;
+  int       current_km;
+  double    current_meter,
+            speed[3]; /* METERS/MIN */
+  size_t    score[2]; /* [0] PLANE SCORE; [1] MOUNTAIN SCORE */
+} biker_t;
 
 typedef struct {
   /*size_t      bikers_num;*/
@@ -47,6 +46,8 @@ typedef struct {
   double            relative_dist;
   char              complete;
 } checkpoint_t;
+
+static const size_t checkpoint_score[6] = { 45, 35, 25, 15, 10, 5 };
 
 typedef struct {
   kilometer         *kilometers;

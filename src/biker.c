@@ -32,7 +32,7 @@ BIKERmake_all (size_t bikers_num, biker_speed_t speed_type) {
     bikers[i].current_km = -1;
     bikers[i].current_meter = 1000.0;
     init_speed(bikers[i].speed, speed_type);
-    bikers[i].plane_score = bikers[i].mountain_score = 0;
+    bikers[i].score[0] = bikers[i].score[1] = 0;
     printf("speed #%u: %f\n", i, bikers[i].speed[0]);
   }
   return bikers;
@@ -98,7 +98,7 @@ advance_kilometer (biker_t *biker, road_t *road) {
 }
 
 void
-checkpoint (biker_t *biker, road_t *road) {
+check_checkpoint (biker_t *biker, road_t *road) {
   int           check_id, i;
   checkpoint_t  *checkpoint;
   check_id = road->kilometers[biker->current_km].checkpoint_id;
@@ -111,11 +111,17 @@ checkpoint (biker_t *biker, road_t *road) {
         if (checkpoint->bikers_id[i] < 0)  {
           /*printf("Biker #%d has crossed cp #%d\n", biker->id, check_id);*/
           checkpoint->bikers_id[i] = biker->id;
+          biker->score[road->kilometers[biker->current_km].type != PLANE] +=
+            checkpoint_score[i];
           break;
         }
       }
       if (i == 5 && !checkpoint->complete) {
-        printf("Checkpoint #%d:\n", check_id);
+        printf(
+          "Checkpoint #%d at %.1fkm:\n",
+          check_id,
+          biker->current_km + checkpoint->relative_dist/1000.0
+        );
         for (i = 0; i < 6; i++)
           printf("\t[%d] biker #%d\n", i, checkpoint->bikers_id[i]);
         checkpoint->complete = 1;
@@ -150,7 +156,7 @@ BIKERcallback (void *arg) {
     else {
       biker->current_meter += 
         biker->speed[road->kilometers[biker->current_km].type]/2.0;
-      checkpoint(biker, road);
+      check_checkpoint(biker, road);
     }
     nanosleep(&delay, NULL);
   }
