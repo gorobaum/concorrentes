@@ -171,10 +171,16 @@ RACEdisplay_info () {
 }
 
 static void
-dump_report () {
+dump_report (size_t min) {
   size_t i, j;
   for (i = 0; i < road.total_length; i++) {
-    printf("  KM %u: ", i);
+    printf(
+      "[%umin] %cKM %u (%c): ",
+      min,
+      road.kilometers[i].checkpoint_id >= 0 ? '*' : ' ',
+      i,
+      ROADBLOCKTYPE_NAMES[road.kilometers[i].type]
+    );
     for (j = 0; j < road.capacity; j++)
       if (road.kilometers[i].bikers_id[j] > 0)
         printf("%02d ", road.kilometers[i].bikers_id[j]);
@@ -191,8 +197,8 @@ RACEreport (int finished) {
   if (report.count == 0) {
     report.count = report.max_count;
     if (report.max_count > 0) {
-      printf("[%umin] Reporting race status:\n", ++min);
-      dump_report();
+      printf("[%umin] === Reporting race status ===\n", ++min);
+      dump_report(min);
     }
     pthread_cond_broadcast(&report.cond);
   } else if (!finished) {

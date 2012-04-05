@@ -11,11 +11,12 @@
 \maketitle
 \tableofcontents
 
+\clearpage
 \section{Saida do Programa}
 \subsection{arquivo1.txt}
 \subsection{arquivo2.txt}
-\section{Atribuição das Velocidades}
-  Usamos uma distribuição normal de [20-80] para atribuir a velocidade para os ciclistas.
+\section{Atribuição das Velocidades Aleatórias}
+  Usamos uma distribuição uniforme de [20-80] para atribuir a velocidade para os ciclistas.
 \section{Definição de Desempate}
   Para desempatar dois ciclistas, usamos a sua classificação geral, na qual nunca ocorre empate pois depende da ordem na qual cada thread
 consegue a trava do ranking. Assim, se o ciclista A chegou em quinto no geral e o B em oitavo no geral, mas os dois tem 90 pontos
