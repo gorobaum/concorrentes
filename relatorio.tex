@@ -18,6 +18,15 @@
   Usamos uma distribuição normal de [20-80] para atribuir a velocidade para os ciclistas.
 \section{Definição de Desempate}
   Para desempatar dois ciclistas, usamos a sua classificação geral, na qual nunca ocorre empate pois depende da ordem na qual cada thread
-consegue a trava do ranking. Por exemplo, se o ciclista A chegou em quinto no geral e o B em oitavo no geral, mas os dois tem 90 pontos
-cada na camiseta verde, o A vira na frente do B.
+consegue a trava do ranking. Assim, se o ciclista A chegou em quinto no geral e o B em oitavo no geral, mas os dois tem 90 pontos
+cada na camiseta verde, o A virá na frente do B.
+\section{Outras observações}
+\subsection{Delays}
+  As threads do ciclistas fazem um nanosleep de 1ms a cada iteração lógica pois isso permite que o escalonador balanceie melhor a
+distribuição de quotas de tempo entre elas.
+\subsection{Corridas demoram mais minutos virtuais}
+  Para evitar deadlocks na hora de imprimir os relatórios periódicos, tivemos que considerar que ciclistas à espera de espaço no
+quilômetro seguinte também "avançassem no tempo". Portanto naturalmente acontece das corridas levarem mais minutos virtuais de tempo do
+que se imaginaria ser possível. Por exemplo, num percurso de 200km, esperaria-se que o tempo máximo de corrida fosse 600min, mas com o
+tempo adicional de espera dos ciclistas "com engarrafamento" esse tempo na prática acaba facilmente excedendo tal limite.
 \end{document}
