@@ -13,11 +13,11 @@ static struct timespec delay = { 0, 500000 };
 static void
 init_speed (double speed[3], biker_speed_t speed_type) {
   if (speed_type == UNIFORMSPEED)
-    speed[0] = speed[1] = speed[2] = KMH_TO_MMIN(50.0);
+    speed[0] = speed[1] = speed[2] = KMH_TO_MS(50.0);
   else if (speed_type == RANDOMSPEED) {
-    speed[0] = KMH_TO_MMIN(20 + 1.0*rand()/RAND_MAX*60.0);
-    speed[1] = KMH_TO_MMIN(20 + 1.0*rand()/RAND_MAX*60.0);
-    speed[2] = KMH_TO_MMIN(20 + 1.0*rand()/RAND_MAX*60.0);
+    speed[0] = KMH_TO_MS(20 + 1.0*rand()/RAND_MAX*60.0);
+    speed[1] = KMH_TO_MS(20 + 1.0*rand()/RAND_MAX*60.0);
+    speed[2] = KMH_TO_MS(20 + 1.0*rand()/RAND_MAX*60.0);
   }
   else puts("**WARNING**: Unknown speed type detected.");
 }
@@ -39,9 +39,9 @@ BIKERmake_all (size_t bikers_num, biker_speed_t speed_type) {
       "  Upward terrain speed: %f\n"
       "  Downward terrain speed: %f\n",
       i,
-      bikers[i].speed[PLAIN]*3.6,
-      bikers[i].speed[UP]*3.6,
-      bikers[i].speed[DOWN]*3.6
+      MS_TO_KMH(bikers[i].speed[PLAIN]),
+      MS_TO_KMH(bikers[i].speed[UP]),
+      MS_TO_KMH(bikers[i].speed[DOWN])
     );
   }
   return bikers;
