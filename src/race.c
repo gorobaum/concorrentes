@@ -35,7 +35,7 @@ static int
 load_simulation_info (const char* filename) {
   FILE    *input;
   char    buffer[BUFFER_SIZE];
-  size_t  i, total_length;
+  size_t  i, k, total_length;
 
   input = fopen(filename, "r");
   if (!input) return -1;
@@ -56,8 +56,9 @@ load_simulation_info (const char* filename) {
   if (!fgets(buffer, BUFFER_SIZE, input)) return -1;
   sscanf(buffer, "%u", &info.road_total_length);
   /* road blocks */
+  info.blocks = malloc(sizeof(*info.blocks)*(BLOCKS_NUM<<(k=0)));
   for (i = 0, total_length = 0;
-       total_length < info.road_total_length && i < MAX_BLOCKS;
+       total_length < info.road_total_length;
        total_length += info.blocks[i++].length) {
     /* block type */
     if (!fgets(buffer, BUFFER_SIZE, input)) return -1;
@@ -70,6 +71,9 @@ load_simulation_info (const char* filename) {
     /* block length */
     if (!fgets(buffer, BUFFER_SIZE, input)) return -1;
     sscanf(buffer, "%u", &info.blocks[i].length);
+    /* check if we need more memory for the blocks */
+    if (i+1 == (BLOCKS_NUM<<k))
+      info.blocks = realloc(info.blocks, sizeof(*info.blocks)*(BLOCKS_NUM<<(++k)));
   }
 
   info.blocks_num = i;
@@ -338,5 +342,6 @@ RACEcleanup () {
   free(road.checkpoints);
   free(args);
   free(rank.ids);
+  free(info.blocks);
 }
 
