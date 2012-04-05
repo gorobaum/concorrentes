@@ -118,7 +118,7 @@ RACEload (const char *inputfile) {
   size_t          i, j, k;
 
   if (load_simulation_info(inputfile)) {
-    puts("NOT");
+    puts("** Error **: Could not load race information.");
     return -1;
   }
 
@@ -323,7 +323,6 @@ RACErun () {
 void
 RACEcleanup () {
   int i;
-  puts("Bye-buh");
   free(bikers);
   for (i = 0; i < road.total_length; i++)
     free(road.kilometers[i].bikers_id);

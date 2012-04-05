@@ -2,3 +2,6 @@
 .*.swp
 .temp
 ep1
+*.aux
+*.log
+*.toc

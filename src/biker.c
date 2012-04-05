@@ -28,6 +28,7 @@ BIKERmake_all (size_t bikers_num, biker_speed_t speed_type) {
   int  i;
   biker_t *bikers = NULL;
   bikers = (biker_t*)malloc(sizeof(*bikers)*bikers_num);
+  puts("Behold the bikers' stats!");
   for (i = 0; i < bikers_num; i++) {
     bikers[i].id = i;
     bikers[i].current_km = -1;
@@ -35,10 +36,10 @@ BIKERmake_all (size_t bikers_num, biker_speed_t speed_type) {
     init_speed(bikers[i].speed, speed_type);
     bikers[i].score[0] = bikers[i].score[1] = 0;
     printf(
-      "Biker #%u:\n"
-      "  Plain terrain speed: %fkm/h\n"
-      "  Upward terrain speed: %fkm/h\n"
-      "  Downward terrain speed: %fkm/h\n",
+      "  Biker #%u:\n"
+      "    Plain terrain speed: %fkm/h\n"
+      "    Upward terrain speed: %fkm/h\n"
+      "    Downward terrain speed: %fkm/h\n",
       i,
       MS_TO_KMH(bikers[i].speed[PLAIN]),
       MS_TO_KMH(bikers[i].speed[UP]),
@@ -125,13 +126,13 @@ check_checkpoint (biker_t *biker, road_t *road) {
       }
       if (i == 2 && !checkpoint->complete) {
         printf(
-          "Checkpoint #%d at %.1fkm:\n",
+          "<<< Checkpoint #%d at %.1fkm: >>>\n",
           check_id,
           biker->current_km + checkpoint->relative_dist/1000.0
         );
         for (i = 0; i < 3; i++)
           printf(
-            "\t[%d] biker #%02d (+%upts)\n",
+            "  (%d) biker #%02d (+%upts)\n",
             i+1,
             checkpoint->bikers_id[i],
             checkpoint_score[i]
