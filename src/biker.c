@@ -33,7 +33,16 @@ BIKERmake_all (size_t bikers_num, biker_speed_t speed_type) {
     bikers[i].current_meter = 1000.0;
     init_speed(bikers[i].speed, speed_type);
     bikers[i].score[0] = bikers[i].score[1] = 0;
-    printf("speed #%u: %f\n", i, bikers[i].speed[0]);
+    printf(
+      "Biker #%u:\n"
+      "  Plain terrain speed: %f\n"
+      "  Upward terrain speed: %f\n"
+      "  Downward terrain speed: %f\n",
+      i,
+      bikers[i].speed[PLAIN]*3.6,
+      bikers[i].speed[UP]*3.6,
+      bikers[i].speed[DOWN]*3.6
+    );
   }
   return bikers;
 }
@@ -126,7 +135,8 @@ check_checkpoint (biker_t *biker, road_t *road) {
             "\t[%d] biker #%02d (+%upts)\n",
             i+1,
             checkpoint->bikers_id[i],
-            checkpoint_score[i]);
+            checkpoint_score[i]
+          );
         checkpoint->complete = 1;
       }
     }

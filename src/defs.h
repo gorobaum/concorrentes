@@ -15,7 +15,7 @@ typedef enum {
 } biker_speed_t;
 
 typedef enum {
-  PLANE,
+  PLAIN,
   UP,
   DOWN
 } roadblock_t;
@@ -25,10 +25,11 @@ typedef struct {
   int       current_km;
   double    current_meter,
             speed[3]; /* METERS/MIN */
-  size_t    score[2]; /* [0] PLANE SCORE; [1] MOUNTAIN SCORE */
+  size_t    score[2]; /* [0] PLAIN SCORE; [1] MOUNTAIN SCORE */
 } biker_t;
 
-#define SCORE_TYPE(biker, road) ((road)->kilometers[(biker)->current_km].type != PLANE)
+#define SCORE_TYPE(biker, road) \
+  ((road)->kilometers[(biker)->current_km].type != PLAIN)
 
 typedef struct {
   /*size_t      bikers_num;*/

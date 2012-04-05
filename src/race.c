@@ -55,7 +55,7 @@ load_simulation_info (const char* filename) {
     /* block type */
     if (!fgets(buffer, BUFFER_SIZE, input)) return -1;
     switch (buffer[0]) {
-      case 'P': info.blocks[i].type = PLANE; break;
+      case 'P': info.blocks[i].type = PLAIN; break;
       case 'S': info.blocks[i].type = UP; break;
       case 'D': info.blocks[i].type = DOWN; break;
       default: break;
@@ -83,13 +83,13 @@ create_checkpoints () {
   for (i = 0, check_num = 0; i < info.blocks_num; i++) {
     if (info.blocks[i].type != UP) {
       check_km =
-        actual_km + (info.blocks[i].type==PLANE)*(info.blocks[i].length/2);
+        actual_km + (info.blocks[i].type==PLAIN)*(info.blocks[i].length/2);
       road.kilometers[check_km].checkpoint_id = check_num;
       road.checkpoints[check_num].complete = 0;
       for (j = 0; j < 6; j++)
         road.checkpoints[check_num].bikers_id[j] = -1;
       road.checkpoints[check_num++].relative_dist =
-        (info.blocks[i].type==PLANE)*(info.blocks[i].length%2)*500.0;
+        (info.blocks[i].type==PLAIN)*(info.blocks[i].length%2)*500.0;
     }
     actual_km += info.blocks[i].length; 
   }
