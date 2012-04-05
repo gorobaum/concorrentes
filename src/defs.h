@@ -5,7 +5,7 @@
 #include <pthread.h>
 
 #define BUFFER_SIZE 256u
-#define MAX_BLOCKS  256u
+#define BLOCKS_NUM  256u
 
 typedef int biker_id;
 
@@ -78,7 +78,7 @@ typedef struct {
                   road_total_length,
                   blocks_num;
   biker_speed_t   speed_type;
-  roadblock_info  blocks[MAX_BLOCKS];
+  roadblock_info  *blocks;
 } simulation_info;
 
 #endif /* EP1_DEFS_H_ */

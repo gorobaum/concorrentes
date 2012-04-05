@@ -122,6 +122,8 @@ RACEload (const char *inputfile) {
     return -1;
   }
 
+  puts("New race being initialized...");
+
   bikers = BIKERmake_all(info.bikers_num, info.speed_type);
   /*biker.current_km = 0;
   biker.current_meter = 0.0;
@@ -152,7 +154,7 @@ RACEload (const char *inputfile) {
 
   report.count = report.max_count = info.bikers_num;
  
-  puts("New race successfully initialized");
+  puts("New race successfully initialized!");
 
   return 0;
 }
@@ -319,7 +321,7 @@ RACErun () {
   for (i = 0; i < info.blocks_num; i++)
     pthread_mutex_destroy(&road.checkpoints[i].mutex);
 
-  puts("\nRace FINISHED!\nLet's see the rankings!\n");
+  puts("\nRace FINISHED!\nLet's see the rankings!");
 
   display_rank();
 
