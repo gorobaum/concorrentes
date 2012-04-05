@@ -24,7 +24,7 @@ init_speed (double speed[3], biker_speed_t speed_type) {
 }
 
 biker_t*
-BIKERmake_all (size_t bikers_num, biker_speed_t speed_type) {
+BIKERmake_all (unsigned bikers_num, biker_speed_t speed_type) {
   int  i;
   biker_t *bikers = NULL;
   bikers = (biker_t*)malloc(sizeof(*bikers)*bikers_num);
@@ -53,7 +53,7 @@ BIKERmake_all (size_t bikers_num, biker_speed_t speed_type) {
 
 /* REQUIRES LOCK */
 static void 
-remove_from_km (biker_t *biker, kilometer *km, size_t cap) {
+remove_from_km (biker_t *biker, kilometer *km, unsigned cap) {
   int i;
   for (i = 0; i < cap; i++)
     if (km->bikers_id[i] == biker->id) {
@@ -64,7 +64,7 @@ remove_from_km (biker_t *biker, kilometer *km, size_t cap) {
 
 /* REQUIRES LOCK */
 static int
-add_to_km (biker_t *biker, kilometer *km, size_t cap) {
+add_to_km (biker_t *biker, kilometer *km, unsigned cap) {
   int i;
   for (i = 0; i < cap; i++)
     if (km->bikers_id[i] == -1) {
@@ -153,11 +153,11 @@ finish_race (biker_t *biker, rank_t *rank) {
 
 void*
 BIKERcallback (void *arg) {
-  arg_t   *args = (arg_t*)arg;
-  road_t  *road = args->road;
-  biker_t *biker = args->biker;
-  rank_t  *rank = args->rank;
-  size_t  vseconds = 0;
+  arg_t     *args = (arg_t*)arg;
+  road_t    *road = args->road;
+  biker_t   *biker = args->biker;
+  rank_t    *rank = args->rank;
+  unsigned  vseconds = 0;
   
   while (biker->current_km < (int)road->total_length) {
     if (biker->current_meter >= 1000.0 ) {

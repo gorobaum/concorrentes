@@ -1,5 +1,5 @@
 PROG_NAME = ep1
-FLAGS=-m32 -lpthread -D_POSIX_C_SOURCE=199309L
+FLAGS=-lpthread -D_POSIX_C_SOURCE=199309L
 
 SRC_DIR = src
 OBJ_DIR = .temp

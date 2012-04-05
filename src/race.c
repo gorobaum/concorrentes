@@ -24,7 +24,7 @@ static rank_t           rank;
 
 /* Variables used for reporting. */
 static struct {
-  size_t          count, max_count;
+  unsigned        count, max_count;
   pthread_mutex_t mutex;
   pthread_cond_t  cond;
 } report;
@@ -33,9 +33,9 @@ static struct {
  * -1 -> failure */
 static int
 load_simulation_info (const char* filename) {
-  FILE    *input;
-  char    buffer[BUFFER_SIZE];
-  size_t  i, k, total_length;
+  FILE      *input;
+  char      buffer[BUFFER_SIZE];
+  unsigned  i, k, total_length;
 
   input = fopen(filename, "r");
   if (!input) return -1;
@@ -86,8 +86,8 @@ load_simulation_info (const char* filename) {
 
 static void
 create_checkpoints () {
-  int i, j, check_num;
-  size_t actual_km = 0, check_km = 0;
+  int       i, j, check_num;
+  unsigned  actual_km = 0, check_km = 0;
 
   road.checkpoints = malloc(sizeof(*road.checkpoints)*info.blocks_num);
 
@@ -119,7 +119,7 @@ init_km(kilometer *km, roadblock_t type) {
 
 int
 RACEload (const char *inputfile) {
-  size_t          i, j, k;
+  unsigned i, j, k;
 
   if (load_simulation_info(inputfile)) {
     puts("** Error **: Could not load race information.");
@@ -165,7 +165,7 @@ RACEload (const char *inputfile) {
 
 void
 RACEdisplay_info () {
-  size_t i;
+  unsigned i;
   printf(
     "%u\n%u\n%c\n%u\n",
     info.bikers_num,
@@ -179,8 +179,8 @@ RACEdisplay_info () {
 }
 
 static void
-dump_report (size_t min) {
-  size_t i, j;
+dump_report (unsigned min) {
+  unsigned i, j;
   for (i = 0; i < road.total_length; i++) {
     printf(
       "[%umin] %cKM %u (%c): ",
@@ -198,7 +198,7 @@ dump_report (size_t min) {
 
 void
 RACEreport (int finished) {
-  static size_t min = 0;
+  static unsigned min = 0;
   pthread_mutex_lock(&report.mutex);
   report.count--;
   if (finished) report.max_count--;
@@ -245,7 +245,7 @@ cmp_mountain_score(const void *lhs, const void *rhs) {
 
 static void
 display_rank () {
-  size_t  i;
+  unsigned  i;
   biker_t **scored_rank = NULL;
   puts("\n======= YELLOW RANKING =======");
   for (i = 0; i < info.bikers_num; i++)
@@ -276,7 +276,7 @@ display_rank () {
 
 int
 RACErun () {
-  size_t i;
+  unsigned  i;
   pthread_t *biker_thread;
 
   biker_thread = malloc(sizeof(pthread_t)*info.bikers_num);

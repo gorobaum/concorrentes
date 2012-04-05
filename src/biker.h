@@ -8,7 +8,7 @@
 #define MS_TO_KMH(v)  ((v)*3.6)
 
 biker_t*
-BIKERmake_all (size_t bikers_num, biker_speed_t speed_type);
+BIKERmake_all (unsigned bikers_num, biker_speed_t speed_type);
 
 void*
 BIKERcallback (void *arg);

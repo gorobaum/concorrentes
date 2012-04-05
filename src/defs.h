@@ -25,14 +25,13 @@ typedef struct {
   int       current_km;
   double    current_meter,
             speed[3]; /* METERS/MIN */
-  size_t    score[2]; /* [0] PLAIN SCORE; [1] MOUNTAIN SCORE */
+  unsigned  score[2]; /* [0] PLAIN SCORE; [1] MOUNTAIN SCORE */
 } biker_t;
 
 #define SCORE_TYPE(biker, road) \
   ((road)->kilometers[(biker)->current_km].type != PLAIN)
 
 typedef struct {
-  /*size_t      bikers_num;*/
   roadblock_t type;
   int         checkpoint_id;
   biker_id    *bikers_id;
@@ -40,7 +39,7 @@ typedef struct {
 
 typedef struct {
   roadblock_t type;
-  size_t      length;
+  unsigned    length;
 } roadblock_info;
 
 typedef struct {
@@ -50,19 +49,19 @@ typedef struct {
   char              complete;
 } checkpoint_t;
 
-static const size_t checkpoint_score[6] = { 45, 35, 25, 15, 10, 5 };
+static const unsigned checkpoint_score[6] = { 45, 35, 25, 15, 10, 5 };
 
 typedef struct {
   kilometer         *kilometers;
   pthread_mutex_t   mutex;
-  size_t            total_length,
+  unsigned          total_length,
 					          capacity;
   checkpoint_t      *checkpoints;
 } road_t;
 
 typedef struct {
   int             *ids;
-  size_t          last;
+  unsigned        last;
   pthread_mutex_t mutex;
 } rank_t;
 
@@ -73,7 +72,7 @@ typedef struct {
 } arg_t;
 
 typedef struct {
-  size_t          bikers_num,
+  unsigned        bikers_num,
                   road_capacity,
                   road_total_length,
                   blocks_num;
