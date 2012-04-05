@@ -311,11 +311,11 @@ RACErun () {
   
   for (i = 0; i < info.bikers_num; i++)
     if (pthread_create(&biker_thread[i], NULL, BIKERcallback, (void*)&args[i]))
-      printf("**WARNING**: Biker #%u was not able to enter the race.\n", i);
+      printf("**WARNING**: Biker #%02d was not able to enter the race.\n", (int)i);
 
   for (i = 0; i < info.bikers_num; i++)
     if (pthread_join(biker_thread[i], NULL))
-      printf("**WARNING**: Biker #%u's companions miss him.\n", i);
+      printf("**WARNING**: Biker #%02d's companions miss him.\n", (int)i);
 
   free(biker_thread);
   pthread_mutex_destroy(&road.mutex);

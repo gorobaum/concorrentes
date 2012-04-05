@@ -159,13 +159,10 @@ BIKERcallback (void *arg) {
   rank_t  *rank = args->rank;
   size_t  vseconds = 0;
   
-  /*puts("Biker runs!");*/
   while (biker->current_km < (int)road->total_length) {
     if (biker->current_meter >= 1000.0 ) {
-      /*printf("Advanced: %lu\n", biker->current_km);*/
       if (advance_kilometer (biker, road))
         biker->current_meter -= 1000.0;
-      /*printf("Biker #%u advanced to km %u.\n", biker->id, biker->current_km);*/
     }
     else {
       biker->current_meter += 
@@ -174,7 +171,6 @@ BIKERcallback (void *arg) {
     }
     vseconds++;
     if (vseconds >= 60) {
-      /*printf("Biker #%d waiting report.\n", biker->id);*/
       RACEreport(0);
       vseconds = 0;
     }
@@ -182,7 +178,6 @@ BIKERcallback (void *arg) {
   }
   RACEreport(1);
   finish_race(biker, rank);
-  /*printf("Biker #%u finished.\n", biker->id);*/
   return NULL;
 }
 
