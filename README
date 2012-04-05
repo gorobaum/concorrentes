@@ -1,10 +1,14 @@
 
 EP1 de MAC0438-2012.
 
-TODO list:
-- Implementar vetor de quilômetros. OK
-- Implementar ciclistas.
-- Implementar thread "reporter" que notifica os estado da corrida a cada minuto.
-- Implementar checkpoints.
+Thiago de Gouveia Nunes NUSP 6797289
+Wilson Kazuo Mizutani   NUSP 6797230
 
+Para compilar esse EP basta usar o Makefile na pasta root.
+
+Para compilar o EP numa maquina 64 bits, pode ser necessário retirar da segunda
+linha do Makefile a FLAG de compilação -m32. Isso pode gerar alguns warnings,
+mas o EP irá rodar sem problemas.
+
+Mais informações no PDF "relatorio.pdf".
 

@@ -36,9 +36,9 @@ BIKERmake_all (size_t bikers_num, biker_speed_t speed_type) {
     bikers[i].score[0] = bikers[i].score[1] = 0;
     printf(
       "Biker #%u:\n"
-      "  Plain terrain speed: %f\n"
-      "  Upward terrain speed: %f\n"
-      "  Downward terrain speed: %f\n",
+      "  Plain terrain speed: %fkm/h\n"
+      "  Upward terrain speed: %fkm/h\n"
+      "  Downward terrain speed: %fkm/h\n",
       i,
       MS_TO_KMH(bikers[i].speed[PLAIN]),
       MS_TO_KMH(bikers[i].speed[UP]),
