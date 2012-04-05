@@ -5,6 +5,7 @@
 #include <time.h>
 #include <unistd.h>
 #include "biker.h"
+#include "race.h"
 
 static struct timespec delay = { 0, 1000000 };
 
@@ -174,7 +175,8 @@ BIKERcallback (void *arg) {
     }
     vseconds++;
     if (vseconds >= 60) {
-      RACEreport();
+      printf("Biker #%d waiting report.\n", biker->id);
+      /*RACEreport();*/
       vseconds = 0;
     }
     nanosleep(&delay, NULL);

@@ -150,6 +150,8 @@ RACEload (const char *inputfile) {
     args[i].rank = &rank;
   }
 
+  report.count = 0;
+
   return 0;
 }
 
@@ -170,7 +172,16 @@ RACEdisplay_info () {
 
 void
 RACEreport () {
-  
+  pthread_mutex_lock(&report.mutex);
+  report.count++;
+  if (report.count+1 >= info.bikers_num) {
+    report.count = 0;
+    puts("report");
+    pthread_cond_broadcast(&report.cond);
+  } else {
+    pthread_cond_wait(&report.cond, &report.mutex);
+  }
+  pthread_mutex_unlock(&report.mutex);
 }
 
 static int
@@ -181,6 +192,8 @@ cmp_total_score(const int b, const int a) {
     if (rank.ids[i] == b) return 1;
     else if (rank.ids[i] == a) return -1;
   }
+  /* never happens */
+  return 0;
 }
 
 static int
