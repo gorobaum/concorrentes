@@ -24,7 +24,7 @@ static rank_t           rank;
 
 /* Variables used for reporting. */
 static struct {
-  size_t          count;
+  size_t          count, max_count;
   pthread_mutex_t mutex;
   pthread_cond_t  cond;
 } report;
@@ -150,7 +150,7 @@ RACEload (const char *inputfile) {
     args[i].rank = &rank;
   }
 
-  report.count = 0;
+  report.count = report.max_count = info.bikers_num;
 
   return 0;
 }
@@ -170,15 +170,32 @@ RACEdisplay_info () {
       info.blocks[i].length);
 }
 
+static void
+dump_report () {
+  size_t i, j;
+  for (i = 0; i < road.total_length; i++) {
+    printf("  KM %u: ", i);
+    for (j = 0; j < road.capacity; j++)
+      if (road.kilometers[i].bikers_id[j] > 0)
+        printf("%02d ", road.kilometers[i].bikers_id[j]);
+    puts("");
+  }
+}
+
 void
-RACEreport () {
+RACEreport (int finished) {
+  static size_t min = 0;
   pthread_mutex_lock(&report.mutex);
-  report.count++;
-  if (report.count+1 >= info.bikers_num) {
-    report.count = 0;
-    puts("report");
+  report.count--;
+  if (finished) report.max_count--;
+  if (report.count == 0) {
+    report.count = report.max_count;
+    if (report.max_count > 0) {
+      printf("[%umin] Reporting race status:\n", ++min);
+      dump_report();
+    }
     pthread_cond_broadcast(&report.cond);
-  } else {
+  } else if (!finished) {
     pthread_cond_wait(&report.cond, &report.mutex);
   }
   pthread_mutex_unlock(&report.mutex);

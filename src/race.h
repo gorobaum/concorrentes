@@ -20,7 +20,7 @@ int
 RACErun ();
 
 void
-RACEreport ();
+RACEreport (int finished);
 
 /* Cleans up all the dinamic memory used by the last race, so that a new one may
  * be loaded through RACEload. */

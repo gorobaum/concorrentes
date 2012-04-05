@@ -73,38 +73,36 @@ add_to_km (biker_t *biker, kilometer *km, size_t cap) {
   return 0;
 }
 
-static void
+static int
 advance_kilometer (biker_t *biker, road_t *road) {
-  while(1) {
-    /* LOCK */
-    pthread_mutex_lock(&road->mutex);
-    if (biker->current_km < 0) {
-      /*road->kilometers[++biker->current_km].bikers_num++;*/
-      if (add_to_km(biker, &road->kilometers[biker->current_km+1], road->capacity)) {
-        biker->current_km++;
-        break;
-      }
-    }
-    if (biker->current_km >= (int)road->total_length-1) {
-      /*road->kilometers[biker->current_km].bikers_num--;*/
-      remove_from_km(biker, &road->kilometers[biker->current_km], road->capacity);
+  /* LOCK */
+  pthread_mutex_lock(&road->mutex);
+  if (biker->current_km < 0) {
+    /*road->kilometers[++biker->current_km].bikers_num++;*/
+    if (add_to_km(biker, &road->kilometers[biker->current_km+1], road->capacity)) {
       biker->current_km++;
-      break;
+      pthread_mutex_unlock(&road->mutex);
+      return 1;
     }
-    else if (add_to_km(biker, &road->kilometers[biker->current_km+1], road->capacity)) {
-      /*road->kilometers[biker->current_km].bikers_num--;
-      road->kilometers[++biker->current_km].bikers_num++;*/
-      remove_from_km(biker, &road->kilometers[biker->current_km], road->capacity);
-      biker->current_km++;
-      break;
-    }
-    /* UNLOCK */
+  }
+  if (biker->current_km >= (int)road->total_length-1) {
+    /*road->kilometers[biker->current_km].bikers_num--;*/
+    remove_from_km(biker, &road->kilometers[biker->current_km], road->capacity);
+    biker->current_km++;
     pthread_mutex_unlock(&road->mutex);
-    /* YIELD */
-    /*sched_yield();*/
+    return 1;
+  }
+  else if (add_to_km(biker, &road->kilometers[biker->current_km+1], road->capacity)) {
+    /*road->kilometers[biker->current_km].bikers_num--;
+    road->kilometers[++biker->current_km].bikers_num++;*/
+    remove_from_km(biker, &road->kilometers[biker->current_km], road->capacity);
+    biker->current_km++;
+    pthread_mutex_unlock(&road->mutex);
+    return 1;
   }
   /* UNLOCK */
   pthread_mutex_unlock(&road->mutex);
+  return 0;
 }
 
 void
@@ -164,8 +162,8 @@ BIKERcallback (void *arg) {
   while (biker->current_km < (int)road->total_length) {
     if (biker->current_meter >= 1000.0 ) {
       /*printf("Advanced: %lu\n", biker->current_km);*/
-      advance_kilometer (biker, road);
-      biker->current_meter -= 1000.0;
+      if (advance_kilometer (biker, road))
+        biker->current_meter -= 1000.0;
       /*printf("Biker #%u advanced to km %u.\n", biker->id, biker->current_km);*/
     }
     else {
@@ -175,12 +173,13 @@ BIKERcallback (void *arg) {
     }
     vseconds++;
     if (vseconds >= 60) {
-      printf("Biker #%d waiting report.\n", biker->id);
-      /*RACEreport();*/
+      /*printf("Biker #%d waiting report.\n", biker->id);*/
+      RACEreport(0);
       vseconds = 0;
     }
     nanosleep(&delay, NULL);
   }
+  RACEreport(1);
   finish_race(biker, rank);
   /*printf("Biker #%u finished.\n", biker->id);*/
   return NULL;
