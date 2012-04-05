@@ -22,6 +22,13 @@ static biker_t          *bikers;
 static road_t           road;
 static rank_t           rank;
 
+/* Variables used for reporting. */
+static struct {
+  size_t          count;
+  pthread_mutex_t mutex;
+  pthread_cond_t  cond;
+} report;
+
 /*  0 -> success
  * -1 -> failure */
 static int
@@ -161,6 +168,11 @@ RACEdisplay_info () {
       info.blocks[i].length);
 }
 
+void
+RACEreport () {
+  
+}
+
 static int
 cmp_total_score(const int b, const int a) {
   int i;
@@ -170,7 +182,7 @@ cmp_total_score(const int b, const int a) {
     else if (rank.ids[i] == a) return -1;
   }
 }
-/* TODO draw criteria */
+
 static int
 cmp_plane_score(const void *lhs, const void *rhs) {
   int comp; 
@@ -226,12 +238,22 @@ RACErun () {
   biker_thread = malloc(sizeof(pthread_t)*info.bikers_num);
 
   if (pthread_mutex_init(&road.mutex, NULL)) {
-    puts("error creating mutex.");
+    puts("error creating road mutex.");
     return -1;
   }
 
   if (pthread_mutex_init(&rank.mutex, NULL)) {
-    puts("error creating mutex.");
+    puts("error creating ranking mutex.");
+    return -1;
+  }
+
+  if (pthread_mutex_init(&report.mutex, NULL)) {
+    puts("error creating report mutex.");
+    return -1;
+  }
+
+  if (pthread_cond_init(&report.cond, NULL)) {
+    puts("error creating report condition.");
     return -1;
   }
 
@@ -252,6 +274,8 @@ RACErun () {
   free(biker_thread);
   pthread_mutex_destroy(&road.mutex);
   pthread_mutex_destroy(&rank.mutex);
+  pthread_mutex_destroy(&report.mutex);
+  pthread_cond_destroy(&report.cond);
   for (i = 0; i < info.blocks_num; i++)
     pthread_mutex_destroy(&road.checkpoints[i].mutex);
 

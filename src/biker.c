@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include "biker.h"
 
-static struct timespec delay = { 0, 500000 };
+static struct timespec delay = { 0, 1000000 };
 
 /* Funções de Inicialização */
 
@@ -157,6 +157,7 @@ BIKERcallback (void *arg) {
   road_t  *road = args->road;
   biker_t *biker = args->biker;
   rank_t  *rank = args->rank;
+  size_t  vseconds = 0;
   
   /*puts("Biker runs!");*/
   while (biker->current_km < (int)road->total_length) {
@@ -170,6 +171,11 @@ BIKERcallback (void *arg) {
       biker->current_meter += 
         biker->speed[road->kilometers[biker->current_km].type]/2.0;
       check_checkpoint(biker, road);
+    }
+    vseconds++;
+    if (vseconds >= 60) {
+      RACEreport();
+      vseconds = 0;
     }
     nanosleep(&delay, NULL);
   }
