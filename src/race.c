@@ -151,6 +151,8 @@ RACEload (const char *inputfile) {
   }
 
   report.count = report.max_count = info.bikers_num;
+ 
+  puts("New race successfully initialized");
 
   return 0;
 }
@@ -182,7 +184,7 @@ dump_report (size_t min) {
       ROADBLOCKTYPE_NAMES[road.kilometers[i].type]
     );
     for (j = 0; j < road.capacity; j++)
-      if (road.kilometers[i].bikers_id[j] > 0)
+      if (road.kilometers[i].bikers_id[j] >= 0)
         printf("%02d ", road.kilometers[i].bikers_id[j]);
     puts("");
   }
@@ -197,7 +199,7 @@ RACEreport (int finished) {
   if (report.count == 0) {
     report.count = report.max_count;
     if (report.max_count > 0) {
-      printf("[%umin] === Reporting race status ===\n", ++min);
+      printf("\n[%umin] === Reporting race status ===\n", ++min);
       dump_report(min);
     }
     pthread_cond_broadcast(&report.cond);
@@ -239,14 +241,14 @@ static void
 display_rank () {
   size_t  i;
   biker_t **scored_rank = NULL;
-  puts("======= YELLOW RANKING =======");
+  puts("\n======= YELLOW RANKING =======");
   for (i = 0; i < info.bikers_num; i++)
     printf("\t[%3u] Biker #%02d\n", i+1, rank.ids[i]);
   scored_rank = malloc(sizeof(*scored_rank)*info.bikers_num);
   for (i = 0; i < info.bikers_num; i++)
     scored_rank[i] = bikers+i;
   qsort(scored_rank, info.bikers_num, sizeof(*scored_rank), cmp_plane_score);
-  puts("======= GREEN RANKING =======");
+  puts("\n======= GREEN RANKING =======");
   for (i = 0; i < info.bikers_num; i++)
     printf(
       "\t[%3u] Biker #%02d (%upts)\n",
@@ -255,7 +257,7 @@ display_rank () {
       scored_rank[i]->score[0]
     );
   qsort(scored_rank, info.bikers_num, sizeof(*scored_rank), cmp_mountain_score);
-  puts("======= RED-DOTTED WHITE RANKING =======");
+  puts("\n======= RED-DOTTED WHITE RANKING =======");
   for (i = 0; i < info.bikers_num; i++)
     printf(
       "\t[%3u] Biker #%02d (%upts)\n",
@@ -298,6 +300,8 @@ RACErun () {
       puts("error creating checkpoints mutex.");
       return -1;
     }
+
+  puts("Race START!");
   
   for (i = 0; i < info.bikers_num; i++)
     if (pthread_create(&biker_thread[i], NULL, BIKERcallback, (void*)&args[i]))
@@ -314,6 +318,8 @@ RACErun () {
   pthread_cond_destroy(&report.cond);
   for (i = 0; i < info.blocks_num; i++)
     pthread_mutex_destroy(&road.checkpoints[i].mutex);
+
+  puts("\nRace FINISHED!\nLet's see the rankings!\n");
 
   display_rank();
 

@@ -126,7 +126,7 @@ check_checkpoint (biker_t *biker, road_t *road) {
       }
       if (i == 2 && !checkpoint->complete) {
         printf(
-          "<<< Checkpoint #%d at %.1fkm: >>>\n",
+          "\n<<< Checkpoint #%d at %.1fkm: >>>\n",
           check_id,
           biker->current_km + checkpoint->relative_dist/1000.0
         );
