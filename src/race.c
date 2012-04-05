@@ -161,17 +161,30 @@ RACEdisplay_info () {
       info.blocks[i].length);
 }
 
+static int
+cmp_total_score(const int b, const int a) {
+  int i;
+
+  for (i = 0; i < rank.last; i++) {
+    if (rank.ids[i] == b) return 1;
+    else if (rank.ids[i] == a) return -1;
+  }
+}
 /* TODO draw criteria */
 static int
 cmp_plane_score(const void *lhs, const void *rhs) {
-  return
-    (*(const biker_t**)rhs)->score[0] - (*(const biker_t**)lhs)->score[0];
+  int comp; 
+  comp = (*(const biker_t**)rhs)->score[0] - (*(const biker_t**)lhs)->score[0];
+  if ( comp == 0 ) return cmp_total_score((*(const biker_t**)rhs)->id, (*(const biker_t**)lhs)->id);
+  else return comp;
 }
 
 static int
 cmp_mountain_score(const void *lhs, const void *rhs) {
-  return
-    (*(const biker_t**)rhs)->score[1] - (*(const biker_t**)lhs)->score[1];
+  int comp; 
+  comp = (*(const biker_t**)rhs)->score[1] - (*(const biker_t**)lhs)->score[1];
+  if ( comp == 0 ) return cmp_total_score((*(const biker_t**)rhs)->id, (*(const biker_t**)lhs)->id);
+  else return comp;
 }
 
 static void
